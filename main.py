@@ -79,13 +79,14 @@ def set_states():
     all_states = []
     
     #getting all permutations
-    for i in zp:
-        for j in zpm:
-            for k in zpm:
-                for l in derivs:
-                    for m in derivs:
-                        for n in derivs:
-                            all_states.append([i,l,j,m,k,n])
+    for in_q in zp:
+        for vol_q in zpm:
+            for out_q in zpm:
+                for in_d in derivs:
+                    for vol_d in derivs:
+                        for out_d in derivs:
+                            all_states.append([in_q,in_d,vol_q,vol_d,out_q,out_d])
+    
     all_val_states = []
     for state in all_states:
         if valid(state):
@@ -93,7 +94,7 @@ def set_states():
 
     for state in all_val_states:
         print state
-    print len(all_val_states)
+
 
 #START PROGRAM
 if __name__ == "__main__":
