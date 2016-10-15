@@ -3,27 +3,10 @@
 # Nedko en Diede
 # 14/10/16
 
-#class Quantity():
-
-#class State(params):
-#    def __init__(self, name):
-#        inflow_q = params  
-#                          
-#class Influence():
-#    def __init__(self, name):
-
 # GLOBAL VARIABLES
 zp = ['zero','plus']
 zpm = ['zero','plus','max']
 derivs = ['-','0','+']
-
-
-
-I1 = ['inflow', 'plus', 'volume', '+']
-I2 = ['outflow', 'plus', 'volume', '-']
-I = [I1]+[I2]
-
-P = ['volume', '+', 'outflow', '+']
 
 INFLOW_Q = 0
 INFLOW_D = 1
@@ -36,10 +19,65 @@ VC1 = [VOLUME_Q, 'max', OUTFLOW_Q, 'max']
 VC2 = [OUTFLOW_Q, 'max', VOLUME_Q, 'max']
 VC3 = [VOLUME_Q, 'zero', OUTFLOW_Q, 'zero']
 VC4 = [OUTFLOW_Q, 'zero', VOLUME_Q, 'zero']
-VCS = [VC1]+[VC2]+[VC3]+[VC4]
-        
-def set_initial_states():
+VC_list = [VC1]+[VC2]+[VC3]+[VC4]
+
+I1 = [INFLOW_Q, 'zero', VOLUME_D, '+']
+I2 = [OUTFLOW_Q, 'zero', VOLUME_D, '-']
+I_list = [I1]+[I2]
+
+P1 = [VOLUME_D, OUTFLOW_D]
+P_list = [P1]
+
+def valid_proportionalities(state):
+    for p in P_list:
+        if state[p[0]] != state[p[1]]:
+            return False
+    return True
+
+def valid_influences(state):
+    influences = [[],[],[]]
+    possible_derivs = [[],[],[]]
+    
+    for i in I_list:
+        if (state[i[0]] != i[1]):
+            influences[i[2]/2].append(i[3])
+        else: # if quantity is zero
+            influences[i[2]/2].append('0')
+            
+    for i in range(len(influences)): 
+        if ('+' in influences[i] and '-' in influences[i]) or not influences[i] :
+            possible_derivs[i].extend(['+','0','-'])
+        elif '+' in influences[i]:
+            possible_derivs[i].append('+')
+        elif '-' in influences[i]:
+            possible_derivs[i].append('-')
+        else: # if 0 in subset
+            possible_derivs[i].append('0')
+            
+    for i in range(len(possible_derivs)):
+        if state[i*2+1] not in possible_derivs[i]:
+            return False
+    return True
+
+def valid_vcs(state):
+    for vc in VC_list:
+        if (state[vc[0]] == vc[1]) and (state[vc[2]] != vc[3]):
+            return False
+    return True
+
+def valid(state): 
+    if not valid_vcs(state):
+        return False
+    elif not valid_influences(state):
+        return False
+    elif not valid_proportionalities(state):
+        return False
+    else:
+        return True
+
+def set_states():
     all_states = []
+    
     #getting all permutations
     for i in zp:
         for j in zpm:
@@ -48,32 +86,15 @@ def set_initial_states():
                     for m in derivs:
                         for n in derivs:
                             all_states.append([i,l,j,m,k,n])
-    print len(all_states)
+    all_val_states = []
     for state in all_states:
-        for vc in VCS:
-#            print vc
-#            print state
-#            print state[vc[0]] == vc[1]
-#            print state[vc[2]] != vc[3]
-            if (state[vc[0]] == vc[1]) and (state[vc[2]] != vc[3]):
-#                print 'removed'
-                all_states.remove(state)
-                break
-#            else: 
-#                print 'NOTNOTNOTNOTNOT'
-                
-    print len(all_states)
-    nr = 0
-    for state in all_states:
-        nr +=1
-#        print state
-    print nr     
+        if valid(state):
+            all_val_states.append(state)
 
+    for state in all_val_states:
+        print state
+    print len(all_val_states)
 
-#    state = State(params)
-#    if state.inflow_q == zpm[1]: # if inflow is plus
-#        volume_d = derivs[2] # the derivative of the volume is +
-   
 #START PROGRAM
 if __name__ == "__main__":
-    set_initial_states()
+    set_states()
