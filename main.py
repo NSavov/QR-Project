@@ -49,13 +49,12 @@ def set_initial_states():
                         for n in derivs:
                             all_states.append([i,l,j,m,k,n])
     print len(all_states)
-    for i in range(len(all_states)):
+    for state in all_states:
         for vc in VCS:
 #            print vc
 #            print state
 #            print state[vc[0]] == vc[1]
 #            print state[vc[2]] != vc[3]
-            state = all_states[i]
             if (state[vc[0]] == vc[1]) and (state[vc[2]] != vc[3]):
 #                print 'removed'
                 all_states.remove(state)
@@ -63,11 +62,12 @@ def set_initial_states():
 #            else: 
 #                print 'NOTNOTNOTNOTNOT'
                 
-#    print len(all_states)
+    print len(all_states)
+    nr = 0
     for state in all_states:
-        print state
-#                
-
+        nr +=1
+#        print state
+    print nr     
 
 
 #    state = State(params)
