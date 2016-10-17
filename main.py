@@ -3,13 +3,21 @@
 # Nedko en Diede
 # 14/10/16
 
-
 import itertools
 
+#this algorithm only works with correct models
+
 # GLOBAL VARIABLES
+#! all of the global variable except for the const part should go
+
+#quantity spaces - const (not part of the input)
 zp = ['zero','plus']
 zpm = ['zero','plus','max']
 derivs = ['-','0','+']
+
+#quantities format -> ['name', quantity_space]
+QSPACE_IND = 0
+quantities = {'inflow': [zp], 'volume': [zpm],'outflow': [zpm]}
 
 quantity_spaces = [zp, zpm, zpm]
 INFLOW_Q = 0
@@ -19,21 +27,25 @@ VOLUME_D = 3
 OUTFLOW_Q = 4
 OUTFLOW_D = 5
 
+#these constraints are not part of the input - they are part of the algorithm
 C1 = ['zero','-']
 C2 = ['max', '+'] # think about this constraint
 C_list = [C1]+[C2]
 
-VC1 = [VOLUME_Q, 'max', OUTFLOW_Q, 'max']
-VC2 = [OUTFLOW_Q, 'max', VOLUME_Q, 'max']
-VC3 = [VOLUME_Q, 'zero', OUTFLOW_Q, 'zero']
-VC4 = [OUTFLOW_Q, 'zero', VOLUME_Q, 'zero']
+#variable correspondances - [from_qname, value, to_qname, value]
+VC1 = ['volume', 'max', 'outflow', 'max']
+VC2 = ['outflow', 'max', 'volume', 'max']
+VC3 = ['volume', 'zero', 'outflow', 'zero']
+VC4 = ['outflow', 'zero', 'volume', 'zero']
 VC_list = [VC1]+[VC2]+[VC3]+[VC4]
 
-I1 = [INFLOW_Q, 'zero', VOLUME_D, '+']
-I2 = [OUTFLOW_Q, 'zero', VOLUME_D, '-']
+#influences - [qname, dname]
+I1 = ['inflow', 'volume', '+']
+I2 = ['outflow', 'volume', '-']
 I_list = [I1]+[I2]
 
-P1 = [VOLUME_D, OUTFLOW_D]
+#proportionalities(positive) - [dname, dname]
+P1 = ['volume', 'outflow']
 P_list = [P1]
 
 
@@ -76,8 +88,8 @@ def get_connections(all_states):
 
 def valid_constraints(state):
     for c in C_list:
-        for i in range(0,6,2): # this is ugly
-            if (state[i] == c[0]) and (state[i+1] == c[1]):
+        for key, value in state.items(): # this is ugly
+            if (value[0] == c[0]) and (value[1] == c[1]):
                 return False
     return True
 
@@ -88,34 +100,45 @@ def valid_proportionalities(state):
     return True
 
 def valid_influences(state):
-    influences = [[],[],[]]
-    possible_derivs = [[],[],[]]
+    influences = {}
+    possible_derivs = {}
     
     for i in I_list:
-        if (state[i[0]] != i[1]):
-            influences[i[2]/2].append(i[3])
+        if i[1] not in influences.keys():
+            influences[i[1]] = []
+        #if the current quantity is not zero
+        if (state[i[0]][0] != quantities[i[0]][QSPACE_IND][0]):
+            influences[i[1]].append(i[2])
         else: # if quantity is zero
-            influences[i[2]/2].append('0')
+            influences[i[1]].append(quantities[i[0]][QSPACE_IND][0])
             
-    for i in range(len(influences)): 
-        if ('+' in influences[i] and '-' in influences[i]) or not influences[i] :
-            possible_derivs[i].extend(['+','0','-'])
-        elif '+' in influences[i]:
-            possible_derivs[i].append('+')
-        elif '-' in influences[i]:
-            possible_derivs[i].append('-')
+    for key in state.keys(): 
+        if key not in influences.keys():
+            influences[key] = []    
+        if key not in possible_derivs.keys():
+            possible_derivs[key] = []  
+
+        if ('+' in influences[key] and '-' in influences[key]) or not influences[key] :
+            possible_derivs[key].extend(['+','0','-'])
+        elif '+' in influences[key]:
+            possible_derivs[key].append('+')
+        elif '-' in influences[key]:
+            possible_derivs[key].append('-')
         else: # if 0 in subset
-            possible_derivs[i].append('0')
-            
-    for i in range(len(possible_derivs)):
-        if state[i*2+1] not in possible_derivs[i]:
+            possible_derivs[key].append('0')
+    
+    for key, value in possible_derivs.items():
+        if state[key][1] not in value:
             return False
     return True
 
 def valid_vcs(state):
     for vc in VC_list:
-        if (state[vc[0]] == vc[1]) and (state[vc[2]] != vc[3]):
+        if (state[vc[0]][0] == vc[1]) and (state[vc[2]][0] != vc[3]):
+            # print 'no', state
             return False
+        # else:
+            # print 'yes', state
     return True
 
 def valid(state): 
@@ -130,17 +153,27 @@ def valid(state):
     else:
         return True
 
+def convert_to_states(comb_lst):
+    all_states = []
+    q_keys = list(quantities.keys())
+    for comb in comb_lst:
+        state = {}
+        for i in range(0, len(comb), 2):
+            state[q_keys[i/2]] = [comb[i], comb[i+1]]
+        all_states.append(state)	
+    return all_states
+
 def set_states():
     all_states = []
-    
-    #getting all permutations
-    for in_q in quantity_spaces[0]:
-        for vol_q in quantity_spaces[1]:
-            for out_q in quantity_spaces[2]:
-                for in_d in derivs:
-                    for vol_d in derivs:
-                        for out_d in derivs:
-                            all_states.append([in_q,in_d,vol_q,vol_d,out_q,out_d])
+    perm_sets = []
+    for name, quantity in quantities.items():
+        perm_sets.append(quantity[QSPACE_IND])
+        perm_sets.append(derivs)
+
+    all_combinations = list(itertools.product(*perm_sets))
+    all_combinations_lst = [list(elem) for elem in all_combinations]
+    all_states = convert_to_states(all_combinations_lst)
+
     
     all_val_states = []
     for state in all_states:
@@ -148,11 +181,15 @@ def set_states():
             all_val_states.append(state)
 
     for state in all_val_states:
-        print state
-    
+        print state    
+    print len(all_val_states)
     return all_val_states
+
+def start():
+    all_states = set_states()
+    # get_connections(all_states)
+    
 
 #START PROGRAM
 if __name__ == "__main__":
-    all_states = set_states()
-    get_connections(all_states)
+    start()
