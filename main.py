@@ -42,11 +42,38 @@ I_list = [I1]+[I2]
 P1 = ['volume', 'outflow']
 P_list = [P1]
 
-
-def alter_quantities(state, list_of_indices, derivs):
+def subtract_one(state, quantity):
+    print state[quantity]
+    new_state = state.copy()
+    index = quantities[quantity][QSPACE_IND].index(state[quantity][0])
+    if index != 0:
+        new_state[quantity][0] = quantities[quantity][QSPACE_IND][index-1] 
+    return new_state
+    
+def add_one(state, quantity):
+    new_state = state.copy()
+    index = quantities[quantity][QSPACE_IND].index(state[quantity][0])
+    if index != len(quantities[quantity])-1:
+        new_state[quantity][0] = quantities[quantity][QSPACE_IND][index+1]
+    return new_state
+        
+def alter_quantities(state, combinations):
+    new_state = state.copy()
+    new_states = []
+    for comb in combinations:
+        # print comb
+        for quantity in list(comb):
+            # print quantity
+            if state[quantity][1] == '+':
+                new_states.append(add_one(new_state, quantity))
+            else:
+                new_states.append(subtract_one(new_state, quantity))
+    return new_states
+    
+def get_changeable_combinations(list_of_indices):
     combinations = []
-    for m in range(len(list_of_indices)):
-        combinations.append(list(set(itertools.combinations(list_of_indices, m))))
+    for m in range(1, len(list_of_indices)+1):
+        combinations.extend(list(set(itertools.combinations(list_of_indices, m))))
     return combinations
              
     
@@ -54,8 +81,9 @@ def get_changable_quantities(state):
     quants = []
     for key, value in state.items():
         if value[1] != '0':
-#            if not (state[quantity] == quantity_spaces[deriv/2][-1] and state[deriv] == '+'):
-            quants.append(value[0])
+           #if quantity is equal  the last value from q space and if the derivative is +, then we don't add it
+           if not (value[0]==quantities[key][QSPACE_IND][-1] and value[1] == '+') and not (value[0]==quantities[key][QSPACE_IND][0] and value[1] == '-'):
+                quants.append(key)
     return quants
     
 def get_changable_derivs():
@@ -71,15 +99,14 @@ def get_changable_derivs():
 
 def get_connections(all_states):
     changable_derivs = get_changable_derivs()
-    print changable_derivs
     for state in all_states:
         quants = get_changable_quantities(state)
-#        print state
-#        print quants
-        combinations = alter_quantities(state, quants, changable_derivs)
+        combinations = get_changeable_combinations(quants)
+        new_states = alter_quantities(state, combinations)
+        print new_states
         # print state
         # print combinations
-        
+        # print '\n'
 
 def valid_constraints(state):
     for c in C_list:
