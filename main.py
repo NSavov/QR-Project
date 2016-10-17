@@ -20,12 +20,6 @@ QSPACE_IND = 0
 quantities = {'inflow': [zp], 'volume': [zpm],'outflow': [zpm]}
 
 quantity_spaces = [zp, zpm, zpm]
-INFLOW_Q = 0
-INFLOW_D = 1
-VOLUME_Q = 2
-VOLUME_D = 3
-OUTFLOW_Q = 4
-OUTFLOW_D = 5
 
 #these constraints are not part of the input - they are part of the algorithm
 C1 = ['zero','-']
@@ -54,22 +48,20 @@ def alter_quantities(state, list_of_indices, derivs):
     for m in range(len(list_of_indices)):
         combinations.append(list(set(itertools.combinations(list_of_indices, m))))
     return combinations
-#    print combinations
              
     
 def get_changable_quantities(state):
     quants = []
-    for deriv in range(1,6,2):
-        quantity = deriv-1
-        if state[deriv] != '0':
+    for key, value in state.items():
+        if value[1] != '0':
 #            if not (state[quantity] == quantity_spaces[deriv/2][-1] and state[deriv] == '+'):
-            quants.append(quantity)
+            quants.append(value[0])
     return quants
     
 def get_changable_derivs():
     changable_derivs = []
     for i in I_list:
-        changable_derivs.append(i[2])
+        changable_derivs.append(i[1])
     changable_derivs = list(set(changable_derivs))
     for p in P_list:
         if p[0] in changable_derivs:
@@ -79,16 +71,19 @@ def get_changable_derivs():
 
 def get_connections(all_states):
     changable_derivs = get_changable_derivs()
+    print changable_derivs
     for state in all_states:
         quants = get_changable_quantities(state)
 #        print state
 #        print quants
-        combinations = alter_quantities(state, quants, changable_derivs) # 
+        combinations = alter_quantities(state, quants, changable_derivs)
+        # print state
+        # print combinations
         
 
 def valid_constraints(state):
     for c in C_list:
-        for key, value in state.items(): # this is ugly
+        for key, value in state.items():
             if (value[0] == c[0]) and (value[1] == c[1]):
                 return False
     return True
@@ -180,14 +175,14 @@ def set_states():
         if valid(state):
             all_val_states.append(state)
 
-    for state in all_val_states:
-        print state    
-    print len(all_val_states)
+    # for state in all_val_states:
+        # print state    
+    # print len(all_val_states)
     return all_val_states
 
 def start():
     all_states = set_states()
-    # get_connections(all_states)
+    get_connections(all_states)
     
 
 #START PROGRAM
