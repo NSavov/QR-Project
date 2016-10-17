@@ -43,7 +43,7 @@ P1 = ['volume', 'outflow']
 P_list = [P1]
 
 def subtract_one(state, quantity):
-    print state[quantity]
+    # print state[quantity]
     new_state = state.copy()
     index = quantities[quantity][QSPACE_IND].index(state[quantity][0])
     if index != 0:
@@ -53,7 +53,7 @@ def subtract_one(state, quantity):
 def add_one(state, quantity):
     new_state = state.copy()
     index = quantities[quantity][QSPACE_IND].index(state[quantity][0])
-    if index != len(quantities[quantity])-1:
+    if index != len(quantities[quantity][QSPACE_IND])-1:
         new_state[quantity][0] = quantities[quantity][QSPACE_IND][index+1]
     return new_state
         
@@ -103,10 +103,9 @@ def get_connections(all_states):
         quants = get_changable_quantities(state)
         combinations = get_changeable_combinations(quants)
         new_states = alter_quantities(state, combinations)
+        print state
         print new_states
-        # print state
-        # print combinations
-        # print '\n'
+        print ''
 
 def valid_constraints(state):
     for c in C_list:
