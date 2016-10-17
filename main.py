@@ -2,7 +2,7 @@
 # QR project
 # Nedko en Diede
 # 14/10/16
-
+import copy
 import itertools
 
 #this algorithm only works with correct models
@@ -39,11 +39,36 @@ I2 = ['outflow', 'volume', '-']
 I_list = [I1]+[I2]
 
 #proportionalities(positive) - [dname, dname]
-P1 = ['volume', 'outflow']
+P1 = ['outflow', 'volume']
 P_list = [P1]
 
+def get_arrow(all_states, new_state, changable_derivs):
+    children = []
+    flag = False
+    #quantity filtering
+    for state in all_states:
+        for key, value in new_state.items():
+            if value[0] != state[key][0]:
+                flag = False
+                break
+        
+        if not flag:
+            flag = True
+            continue
+        
+        for deriv_index in changable_derivs:
+            if new_state[deriv_index][1] != state[deriv_index][1]:
+                flag = False
+                break
+        
+        if not flag:
+            flag = True
+            continue        
+        
+        children.append(all_states.index(state))
+    return children
+    
 def subtract_one(state, quantity):
-    # print state[quantity]
     new_state = state.copy()
     index = quantities[quantity][QSPACE_IND].index(state[quantity][0])
     if index != 0:
@@ -56,18 +81,23 @@ def add_one(state, quantity):
     if index != len(quantities[quantity][QSPACE_IND])-1:
         new_state[quantity][0] = quantities[quantity][QSPACE_IND][index+1]
     return new_state
-        
+       
 def alter_quantities(state, combinations):
-    new_state = state.copy()
     new_states = []
+    # print state
     for comb in combinations:
-        # print comb
-        for quantity in list(comb):
-            # print quantity
+        new_state = copy.deepcopy(state)
+        for quantity in comb:
             if state[quantity][1] == '+':
-                new_states.append(add_one(new_state, quantity))
+                new_state = add_one(new_state, quantity)
+                # print ' ', temp
             else:
-                new_states.append(subtract_one(new_state, quantity))
+                new_state = subtract_one(new_state, quantity)
+        # print comb
+        # print ' ', new_state
+        # print ''
+        new_states.append(new_state)
+        
     return new_states
     
 def get_changeable_combinations(list_of_indices):
@@ -99,13 +129,19 @@ def get_changable_derivs():
 
 def get_connections(all_states):
     changable_derivs = get_changable_derivs()
+    neighbours_list = [[i] for i in range(len(all_states)) ]
     for state in all_states:
         quants = get_changable_quantities(state)
         combinations = get_changeable_combinations(quants)
         new_states = alter_quantities(state, combinations)
-        print state
-        print new_states
-        print ''
+        
+        
+        for new_state in new_states:
+            children = get_arrow(all_states, new_state, changable_derivs)
+            
+            if len(children)>0 :
+                neighbours_list[all_states.index(state)].extend(children)
+    print neighbours_list
 
 def valid_constraints(state):
     for c in C_list:
@@ -156,10 +192,7 @@ def valid_influences(state):
 def valid_vcs(state):
     for vc in VC_list:
         if (state[vc[0]][0] == vc[1]) and (state[vc[2]][0] != vc[3]):
-            # print 'no', state
             return False
-        # else:
-            # print 'yes', state
     return True
 
 def valid(state): 
@@ -201,9 +234,6 @@ def set_states():
         if valid(state):
             all_val_states.append(state)
 
-    # for state in all_val_states:
-        # print state    
-    # print len(all_val_states)
     return all_val_states
 
 def start():
