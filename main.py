@@ -87,6 +87,8 @@ def subtract_one(state, quantity):
     index = quantities[quantity][QSPACE_IND].index(state[quantity][0])
     if index != 0:
         new_state[quantity][0] = quantities[quantity][QSPACE_IND][index-1] 
+    if new_state[quantity][0] == quantities[quantity][QSPACE_IND][0] :
+        new_state[quantity][1] = '0'
     return new_state
     
 def add_one(state, quantity):
@@ -145,6 +147,8 @@ def get_connections(all_states):
         quants = get_changable_quantities(state)
         combinations = get_changeable_combinations(quants)
         new_states = alter_quantities(state, combinations)
+        
+        
         
         for new_state in new_states:
             children = get_arrow(all_states, new_state, non_changable_derivs)
@@ -263,11 +267,11 @@ def start():
     
     pprint.pprint(neighbours_list_str)
     
-    G=nx.DiGraph()
+    # G=nx.DiGraph()
     
-    G.add_nodes_from([get_state_string(state) for state in all_states ])
-    for neghbours in neighbours_list:
-        G.add_edges_from([(get_state_string(all_states[neghbours[0]]), get_state_string(all_states[neghbours[i]])) for i in range(1,len(neghbours))])
+    # G.add_nodes_from([get_state_string(state) for state in all_states ])
+    # for neghbours in neighbours_list:
+        # G.add_edges_from([(get_state_string(all_states[neghbours[0]]), get_state_string(all_states[neghbours[i]])) for i in range(1,len(neghbours))])
     
     # labels = {}
     # for i in range(len(all_states)):
@@ -278,8 +282,8 @@ def start():
     # nx.draw(G)
     # nx.draw_networkx_labels(G,nx.spring_layout(G), labels, font_size=16)
     # plt.show()
-    app = Viewer(G)
-    app.mainloop()
+    # app = Viewer(G)
+    # app.mainloop()
     
 
 #START PROGRAM
