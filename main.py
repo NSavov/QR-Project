@@ -4,6 +4,10 @@
 # 14/10/16
 import copy
 import itertools
+import networkx as nx
+import matplotlib.pyplot as plt
+from networkx_viewer import Viewer
+import pprint
 
 #this algorithm only works with correct models
 
@@ -39,7 +43,7 @@ I2 = ['outflow', 'volume', '-']
 I_list = [I1]+[I2]
 
 #proportionalities(positive) - [dname, dname]
-P1 = ['outflow', 'volume']
+P1 = ['volume', 'outflow']
 P_list = [P1]
 
 def get_arrow(all_states, new_state, changable_derivs):
@@ -129,19 +133,20 @@ def get_changable_derivs():
 
 def get_connections(all_states):
     changable_derivs = get_changable_derivs()
+    non_changable_derivs = list(set(quantities.keys()) - set(changable_derivs))
     neighbours_list = [[i] for i in range(len(all_states)) ]
+    
     for state in all_states:
         quants = get_changable_quantities(state)
         combinations = get_changeable_combinations(quants)
         new_states = alter_quantities(state, combinations)
         
-        
         for new_state in new_states:
-            children = get_arrow(all_states, new_state, changable_derivs)
+            children = get_arrow(all_states, new_state, non_changable_derivs)
             
             if len(children)>0 :
                 neighbours_list[all_states.index(state)].extend(children)
-    print neighbours_list
+    return neighbours_list
 
 def valid_constraints(state):
     for c in C_list:
@@ -227,7 +232,6 @@ def set_states():
     all_combinations = list(itertools.product(*perm_sets))
     all_combinations_lst = [list(elem) for elem in all_combinations]
     all_states = convert_to_states(all_combinations_lst)
-
     
     all_val_states = []
     for state in all_states:
@@ -236,9 +240,43 @@ def set_states():
 
     return all_val_states
 
+def get_state_string(state):
+    str = ""
+    for key, value in state.items():
+        str += key+" " + value[0] + " " + value[1] + '\n'
+    return str
+    
 def start():
     all_states = set_states()
-    get_connections(all_states)
+    neighbours_list = get_connections(all_states)
+    # print neighbours_list
+    
+    neighbours_list_str = []
+    for neghbours in neighbours_list:
+        neighs = []
+        for ind in neghbours:
+            neighs.append(str(all_states[ind]))
+        neighbours_list_str.append(neighs)
+    
+    # pprint.pprint(neighbours_list_str)
+    
+    G=nx.DiGraph()
+    
+    G.add_nodes_from([get_state_string(state) for state in all_states ])
+    for neghbours in neighbours_list:
+        G.add_edges_from([(get_state_string(all_states[neghbours[0]]), get_state_string(all_states[neghbours[i]])) for i in range(1,len(neghbours))])
+    
+    # labels = {}
+    # for i in range(len(all_states)):
+        # labels[i] = '$' + (str(all_states[i])) + '$'
+    
+    # pprint.pprint(labels)
+    # print labels
+    # nx.draw(G)
+    # nx.draw_networkx_labels(G,nx.spring_layout(G), labels, font_size=16)
+    # plt.show()
+    app = Viewer(G)
+    app.mainloop()
     
 
 #START PROGRAM
