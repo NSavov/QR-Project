@@ -46,11 +46,13 @@ I_list = [I1]+[I2]
 P1 = ['volume', 'outflow']
 P_list = [P1]
 
-def get_arrow(all_states, new_state, changable_derivs):
+def get_arrow(all_states, new_state, non_changable_derivs):
     children = []
     flag = False
     #quantity filtering
     for state in all_states:
+        
+        
         for key, value in new_state.items():
             if value[0] != state[key][0]:
                 flag = False
@@ -60,15 +62,23 @@ def get_arrow(all_states, new_state, changable_derivs):
             flag = True
             continue
         
-        for deriv_index in changable_derivs:
+        
+        for deriv_index in non_changable_derivs:
             if new_state[deriv_index][1] != state[deriv_index][1]:
                 flag = False
                 break
         
         if not flag:
             flag = True
-            continue        
+            continue
+        for key, value in state.items():
+            if abs(derivs.index(state[key][1]) - derivs.index(new_state[key][1])) > 1:
+                flag = False
+                break
         
+        if not flag:
+            flag = True
+            continue        
         children.append(all_states.index(state))
     return children
     
@@ -88,18 +98,13 @@ def add_one(state, quantity):
        
 def alter_quantities(state, combinations):
     new_states = []
-    # print state
     for comb in combinations:
         new_state = copy.deepcopy(state)
         for quantity in comb:
             if state[quantity][1] == '+':
                 new_state = add_one(new_state, quantity)
-                # print ' ', temp
             else:
                 new_state = subtract_one(new_state, quantity)
-        # print comb
-        # print ' ', new_state
-        # print ''
         new_states.append(new_state)
         
     return new_states
@@ -115,7 +120,7 @@ def get_changable_quantities(state):
     quants = []
     for key, value in state.items():
         if value[1] != '0':
-           #if quantity is equal  the last value from q space and if the derivative is +, then we don't add it
+        #if quantity is equal  the last value from q space and if the derivative is +, then we don't add it
            if not (value[0]==quantities[key][QSPACE_IND][-1] and value[1] == '+') and not (value[0]==quantities[key][QSPACE_IND][0] and value[1] == '-'):
                 quants.append(key)
     return quants
@@ -143,7 +148,6 @@ def get_connections(all_states):
         
         for new_state in new_states:
             children = get_arrow(all_states, new_state, non_changable_derivs)
-            
             if len(children)>0 :
                 neighbours_list[all_states.index(state)].extend(children)
     return neighbours_list
@@ -249,7 +253,6 @@ def get_state_string(state):
 def start():
     all_states = set_states()
     neighbours_list = get_connections(all_states)
-    # print neighbours_list
     
     neighbours_list_str = []
     for neghbours in neighbours_list:
@@ -258,7 +261,7 @@ def start():
             neighs.append(str(all_states[ind]))
         neighbours_list_str.append(neighs)
     
-    # pprint.pprint(neighbours_list_str)
+    pprint.pprint(neighbours_list_str)
     
     G=nx.DiGraph()
     
