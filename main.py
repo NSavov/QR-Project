@@ -49,21 +49,11 @@ I_list = [I1]+[I2]
 P1 = ['volume', 'outflow']
 P_list = [P1]
 
-def get_start_derivs_exogenous(exog):
-    type = quantities[exog][EXOGENOUS_IND]
-    possible_derivs = []
-    if type == 'decreasing':
-        possible_derivs = ['-']
-            
-    elif type=='stable':
-        possible_derivs = ['0']
-        
-    elif type =='increasing':
-        possible_derivs = ['+']
-            
-    elif type == 'random':
-        possible_derivs = derivs
-    return possible_derivs
+def get_state_string(state):
+    str = ""
+    for key, value in state.items():
+        str += key+" " + value[0] + " " + value[1] + '\n'
+    return str
 
 def get_next_derivs_exogenous(quantity_vals, exog):
     type = quantities[exog][EXOGENOUS_IND]
@@ -93,7 +83,6 @@ def get_arrow(all_states, new_state, exogenous):
     #quantity filtering
     for state in all_states:
         
-        
         for key, value in new_state.items():
             if value[0] != state[key][0]:
                 flag = False
@@ -103,22 +92,9 @@ def get_arrow(all_states, new_state, exogenous):
             flag = True
             continue
         
-        
-        # for deriv_index in non_changable_derivs:
-            # if new_state[deriv_index][1] != state[deriv_index][1]:
-                # flag = False
-                # break
-        
-        # if not flag:
-            # flag = True
-            # continue
-        
         for exog in exogenous:
             possible_derivs = get_next_derivs_exogenous(new_state[exog], exog)
             if state[exog][1] not in possible_derivs:
-                # print state
-                # print new_state
-                # print possible_derivs
                 flag = False
                 break
                 
@@ -185,6 +161,22 @@ def get_changable_quantities(state):
                 else:
                     quants.append(key)
     return quants, instant_quants
+
+def get_start_derivs_exogenous(exog):
+    type = quantities[exog][EXOGENOUS_IND]
+    possible_derivs = []
+    if type == 'decreasing':
+        possible_derivs = ['-']
+            
+    elif type=='stable':
+        possible_derivs = ['0']
+        
+    elif type =='increasing':
+        possible_derivs = ['+']
+            
+    elif type == 'random':
+        possible_derivs = derivs
+    return possible_derivs
     
 def get_inferred_derivs():
     inferred_derivs = []
@@ -206,7 +198,6 @@ def get_exogenous():
     
 def get_connections(all_states):
     exogenous = get_exogenous()
-    # print exogenous
     inferred_derivs = get_inferred_derivs()
     non_changable_derivs = list(set(quantities.keys()) - set(inferred_derivs) - set(exogenous))
     
@@ -219,8 +210,6 @@ def get_connections(all_states):
         for exog in exogenous:
             if state[exog][1] in get_start_derivs_exogenous(exog):
                 current_states.append(state)
-    # pprint.pprint(current_states)
-    # print exogenous
     neighbours_list = [[i] for i in range(len(all_states)+1) ]
     neighbours_list[-1].extend([all_states.index(current_state) for current_state in current_states ])
     for state in current_states:
@@ -234,7 +223,6 @@ def get_connections(all_states):
         
         for new_state in new_states:
             children = get_arrow(all_states, new_state, exogenous)
-            # print all_states[children[0]]
             for child_ind in children:
                 if all_states[child_ind] not in current_states:
                     current_states.append(all_states[child_ind])
@@ -267,8 +255,6 @@ def valid_influences(state):
             influences[i[1]].append(i[2])
         else: # if quantity is zero
             influences[i[1]].append(quantities[i[0]][QSPACE_IND][0])
-    # print state
-    # print influences
     for key in state.keys(): 
         if key not in influences.keys():
             influences[key] = []    
@@ -334,12 +320,6 @@ def set_states():
             all_val_states.append(state)
 
     return all_val_states
-
-def get_state_string(state):
-    str = ""
-    for key, value in state.items():
-        str += key+" " + value[0] + " " + value[1] + '\n'
-    return str
     
 def start():
     all_states = set_states()
