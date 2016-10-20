@@ -19,6 +19,8 @@ zp = ['zero','plus']
 zpm = ['zero','plus','max']
 derivs = ['-','0','+']
 
+landmarks = ['zero', 'max']
+
 #exogenous types - const
 exogenous_types = ['decreasing','stable', 'increasing', 'random']
 #quantities format -> ['name', quantity_space]
@@ -173,12 +175,16 @@ def get_changeable_combinations(list_of_indices):
     
 def get_changable_quantities(state):
     quants = []
+    instant_quants = []
     for key, value in state.items():
         if value[1] != '0':
         #if quantity is equal  the last value from q space and if the derivative is +, then we don't add it
            if not (value[0]==quantities[key][QSPACE_IND][-1] and value[1] == '+') and not (value[0]==quantities[key][QSPACE_IND][0] and value[1] == '-'):
-                quants.append(key)
-    return quants
+                if value[0] in landmarks:
+                    instant_quants.append(key)
+                else:
+                    quants.append(key)
+    return quants, instant_quants
     
 def get_inferred_derivs():
     inferred_derivs = []
@@ -213,14 +219,18 @@ def get_connections(all_states):
         for exog in exogenous:
             if state[exog][1] in get_start_derivs_exogenous(exog):
                 current_states.append(state)
-    pprint.pprint(current_states)
+    # pprint.pprint(current_states)
     # print exogenous
     neighbours_list = [[i] for i in range(len(all_states)+1) ]
     neighbours_list[-1].extend([all_states.index(current_state) for current_state in current_states ])
     for state in current_states:
-        quants = get_changable_quantities(state)
-        combinations = get_changeable_combinations(quants)
-        new_states = alter_quantities(state, combinations)
+        quants, insant_quants = get_changable_quantities(state)
+        if not insant_quants:
+            combinations = get_changeable_combinations(quants)
+            new_states = alter_quantities(state, combinations)
+        else:
+            # instant_combinations = get_changeable_combinations(insant_quants)
+            new_states = alter_quantities(state, [insant_quants])
         
         for new_state in new_states:
             children = get_arrow(all_states, new_state, exogenous)
@@ -257,7 +267,8 @@ def valid_influences(state):
             influences[i[1]].append(i[2])
         else: # if quantity is zero
             influences[i[1]].append(quantities[i[0]][QSPACE_IND][0])
-            
+    # print state
+    # print influences
     for key in state.keys(): 
         if key not in influences.keys():
             influences[key] = []    
@@ -344,7 +355,7 @@ def start():
                 neighs.append(str(all_states[ind]))
         neighbours_list_str.append(neighs)
     
-    # pprint.pprint(neighbours_list_str)
+    pprint.pprint(neighbours_list_str)
     
     G=nx.DiGraph()
     
@@ -356,7 +367,7 @@ def start():
     G.add_edges_from([('Start', get_state_string(all_states[neighbours_list[-1][i]])) for i in range(1,len(neighbours_list[-1]))])
     G.remove_nodes_from(nx.isolates(G))
     
-    nx.write_gexf(G, 'graph.gexf')
+    # nx.write_gexf(G, 'graph.gexf')
     # labels = {}
     # for i in range(len(all_states)):
         # labels[i] = '$' + (str(all_states[i])) + '$'
@@ -366,8 +377,8 @@ def start():
     # nx.draw(G)
     # nx.draw_networkx_labels(G,nx.spring_layout(G), labels, font_size=16)
     # plt.show()
-    # app = Viewer(G)
-    # app.mainloop()
+    app = Viewer(G)
+    app.mainloop()
     
 
 #START PROGRAM
