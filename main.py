@@ -13,6 +13,13 @@ import pprint
 
 # GLOBAL VARIABLES
 
+trace = True
+tc = 0
+tab = '    '
+tr_iter = True
+trace_iter2 = True
+trace_iter3 = True
+
 #quantity spaces - const (not part of the input)
 zp = ['zero','plus']
 zpm = ['zero','plus','max']
@@ -22,36 +29,31 @@ landmarks = ['zero', 'max']
 
 #exogenous types - const
 exogenous_types = ['decreasing','stable', 'increasing', 'random']
-#quantities format -> ['name', quantity_space]
-QSPACE_IND = 0
-EXOGENOUS_IND = 1
-quantities = {'inflow': [zp, 'random'], 'volume': [zpm, ''],'outflow': [zpm, '']}
+
 
 #these constraints are not part of the input - they are part of the algorithm
 C1 = ['zero','-']
 C2 = ['max', '+'] 
 C_list = [C1]+[C2]
 
+#quantities format -> ['name', quantity_space]
+QSPACE_IND = 0
+EXOGENOUS_IND = 1
+quantities = {}
+
 #variable correspondances - [from_qname, value, to_qname, value]
-VC1 = ['volume', 'max', 'outflow', 'max']
-VC2 = ['outflow', 'max', 'volume', 'max']
-VC3 = ['volume', 'zero', 'outflow', 'zero']
-VC4 = ['outflow', 'zero', 'volume', 'zero']
-VC_list = [VC1]+[VC2]+[VC3]+[VC4]
+VC_list = []
 
 #influences - [qname, dname]
-I1 = ['inflow', 'volume', '+']
-I2 = ['outflow', 'volume', '-']
-I_list = [I1]+[I2]
+I_list = []
 
 #proportionalities(positive) - [dname, dname]
-P1 = ['volume', 'outflow']
-P_list = [P1]
+P_list = []
 
-def get_state_string(state):
+def get_state_string(state, eol):
     str = ""
     for key, value in state.items():
-        str += key+" " + value[0] + " " + value[1] + '\n'
+        str += key+" " + value[0] + " " + value[1] + eol
     return str
 
 def get_next_derivs_exogenous(quantity_vals, exog):
@@ -77,11 +79,21 @@ def get_next_derivs_exogenous(quantity_vals, exog):
     return possible_derivs
 
 def get_arrow(all_states, new_state, exogenous, non_changable_derivs):
+    global tc
+    global trace_iter3
     children = []
     flag = False
+    tc += 1
+    if trace and trace_iter3:
+                print tc*tab + "Filter the possible matching children from all valid states:"
+    
+    tc += 1
+    if trace and trace_iter3:
+                print tc*tab + "Filter out all the states not matching the new quantities"
+                print tc*tab + "Filter out all the states with different derivatives defined as non-changable"
+                print tc*tab + "Filter out all the states which doesn't match an exogenous change"
     #quantity filtering
     for state in all_states:
-        
         for key, value in new_state.items():
             if value[0] != state[key][0]:
                 flag = False
@@ -111,8 +123,7 @@ def get_arrow(all_states, new_state, exogenous, non_changable_derivs):
             flag = True
             continue
         
-        print state
-        print 
+        # print state
         
         for key, value in state.items():
             if abs(derivs.index(state[key][1]) - derivs.index(new_state[key][1])) > 1:
@@ -123,6 +134,9 @@ def get_arrow(all_states, new_state, exogenous, non_changable_derivs):
             flag = True
             continue        
         children.append(all_states.index(state))
+    tc -= 1
+    tc -= 1
+    trace_iter3 = False
     return children
     
 def subtract_one(state, quantity):
@@ -208,12 +222,34 @@ def get_exogenous():
             exogenous.append(key) 
     return exogenous
     
+def get_const_landmark_quants(state):
+    landmark_quants = []
+    for key, value in state.items():
+            if value[0] in landmarks and value[1] == '0':
+                landmark_quants.append(key)
+    return landmark_quants
+    
 def get_connections(all_states):
+    global tc
+    global trace_iter2
+    # global trace_iter1
+    if trace:
+        print tc*tab + "Find all the exogenous quantities"
     exogenous = get_exogenous()
+    
+    if trace:
+        print tc*tab + "Find all derivatives that can be inferred from influences and proportionalities"
     inferred_derivs = get_inferred_derivs()
+    
+    if trace:
+        print tc*tab + "Based on these find all the derivatives that cannot change from influences and proportionalities"
     non_changable_derivs = list(set(quantities.keys()) - set(inferred_derivs) - set(exogenous))
     # instant_children = []
+    # pprint.pprint(inferred_derivs)
     
+    
+    if trace:
+        print tc*tab + "Assume these non-changable derivatives to be random exogenous"
     for derivative in non_changable_derivs:
         quantities[derivative][EXOGENOUS_IND] = 'random'
         exogenous.append(derivative)
@@ -223,11 +259,28 @@ def get_connections(all_states):
         for exog in exogenous:
             if state[exog][1] in get_start_derivs_exogenous(exog):
                 current_states.append(state)
-                
+    
     neighbours_list = [[i] for i in range(len(all_states)+1) ]
     neighbours_list[-1].extend([all_states.index(current_state) for current_state in current_states ])
     
+    if trace:
+        print tc*tab + "For every state:"
+    
+    trace_iter = True
     for state in current_states:
+
+        const_landmark_quants = get_const_landmark_quants(state)
+        # print const_landmark_quants
+        
+        if trace and trace_iter:
+            print tc*tab + "Get the quantities that can change in the next step"
+        
+        if trace and trace_iter:
+            print tc*tab + "If there are no instantaneous changes: get a list of valid states with changes in every possible combination of changable quantities"
+        
+        if trace and trace_iter:
+            print tc*tab + "If there are instantaneous changes - get one state with all of them applied"
+            
         quants, instant_quants = get_changable_quantities(state)
         if not instant_quants:
             combinations = get_changeable_combinations(quants)
@@ -241,8 +294,14 @@ def get_connections(all_states):
         # if not instant_quants and INST_CHILD in state.keys():
             # children.extend(get_arrow(all_states, state, exogenous, []))
         
+        if trace and trace_iter2:
+            print tc*tab + "For all states with changed quantities:"
         for new_state in new_states:
+            if trace and trace_iter2:
+                print tc*tab + "In case of instant change - find the next state with least amount of derivative changes"
+                print tc*tab + "Otherwise: find all possible children without restrictions"
             if not not instant_quants:
+                    
                 children = get_arrow(all_states, new_state, exogenous, state.keys())
                 if not children:
                     const_inst_derivs = []
@@ -250,8 +309,13 @@ def get_connections(all_states):
                         if new_state[inst_quant][0] not in landmarks:
                             const_inst_derivs.append(inst_quant)
                     children = get_arrow(all_states, new_state, exogenous, const_inst_derivs)
+                    if not not children:
+                        children = [children[0]]
             else:
                 children = get_arrow(all_states, new_state, exogenous, [])
+            
+            if trace and trace_iter2:
+                print tc*tab + "Connect the state with the found new states"
             
             for child_ind in children:
                 # if not not instant_quants:
@@ -263,7 +327,9 @@ def get_connections(all_states):
                 if ind in children:
                     children.remove(ind)
                 neighbours_list[ind].extend(children)
-    pprint.pprint(neighbours_list)
+            trace_iter2 = False
+        trace_iter = False
+    # pprint.pprint(neighbours_list)
     return neighbours_list
 
 def valid_constraints(state):
@@ -280,6 +346,8 @@ def valid_proportionalities(state):
     return True
 
 def valid_influences(state):
+    # if trace:
+        # print tc*tab + "Check if the influences are satisfied"
     influences = {}
     possible_derivs = {}
     
@@ -312,12 +380,15 @@ def valid_influences(state):
     return True
 
 def valid_vcs(state):
+    # if trace:
+        # print tc*tab + "Check if the VCs are satisfied"
     for vc in VC_list:
         if (state[vc[0]][0] == vc[1]) and (state[vc[2]][0] != vc[3]):
             return False
     return True
 
 def valid(state): 
+    
     if not valid_vcs(state):
         return False
     elif not valid_influences(state):
@@ -340,31 +411,53 @@ def convert_to_states(comb_lst):
     return all_states
 
 def set_states():
+    global tc
     all_states = []
     perm_sets = []
+    
+    if trace:
+        print tc*tab + "Generating all possible (valid and invalid) states"
+    
+    
     for name, quantity in quantities.items():
         perm_sets.append(quantity[QSPACE_IND])
         perm_sets.append(derivs)
-
+    # print perm_sets
     all_combinations = list(itertools.product(*perm_sets))
     all_combinations_lst = [list(elem) for elem in all_combinations]
     all_states = convert_to_states(all_combinations_lst)
     
+    if trace:
+        print tc*tab + "Select only the valid states. For every state:"
+    
+    tc += 1
+    
+    if trace:
+        print tc*tab + "Check if the VCs are satisfied"
+        print tc*tab + "Check if the influences are satisfied"
+        print tc*tab + "Check if the proportionalities are satisfied"
+        print tc*tab + "Check if the algorithm constraints are satisfied"
     all_val_states = []
     for state in all_states:
         if valid(state):
             all_val_states.append(state)
-
+    tc -= 1
     return all_val_states
-def get_state_string(state):
-    str = ""
-    for key, value in state.items():
-        str += key+" " + value[0] + " " + value[1] + '\n'
-    return str
     
 def start():
+    global tc
+    if trace:
+        print tc*tab + "Find all states that are possible for this input"
+    tc += 1
     all_states = set_states()
+    tc -= 1
+    
+    if trace:
+        print tc*tab + "Find the edges of the graph"
+    
+    tc += 1
     neighbours_list = get_connections(all_states)
+    tc -= 1
     
     neighbours_list_str = []
     for neghbours in neighbours_list:
@@ -376,16 +469,16 @@ def start():
                 neighs.append(str(all_states[ind]))
         neighbours_list_str.append(neighs)
     
-    pprint.pprint(neighbours_list_str)
+    # pprint.pprint(neighbours_list_str)
     
     G=nx.DiGraph()
     
-    G.add_nodes_from([get_state_string(state) for state in all_states ])
+    G.add_nodes_from([get_state_string(state, '\n') for state in all_states ])
     G.add_node('Start')
     for neghbours in neighbours_list[:-1]:
-        G.add_edges_from([(get_state_string(all_states[neghbours[0]]), get_state_string(all_states[neghbours[i]])) for i in range(1,len(neghbours))])
+        G.add_edges_from([(get_state_string(all_states[neghbours[0]], '\n'), get_state_string(all_states[neghbours[i]], '\n')) for i in range(1,len(neghbours))])
 
-    G.add_edges_from([('Start', get_state_string(all_states[neighbours_list[-1][i]])) for i in range(1,len(neighbours_list[-1]))])
+    G.add_edges_from([('Start', get_state_string(all_states[neighbours_list[-1][i]], '\n')) for i in range(1,len(neighbours_list[-1]))])
     G.remove_nodes_from(nx.isolates(G))
     
     # nx.write_gexf(G, 'graph.gexf')
@@ -401,7 +494,66 @@ def start():
     app = Viewer(G)
     app.mainloop()
     
+def define_problem_1():
+    global quantities
+    global VC_list
+    global I_list
+    global P_list
+    quantities = {'inflow': [zp, 'increasing'], 'volume': [zpm, ''],'outflow': [zpm, ''], 'height': [zpm, ''], 'pressure': [zpm, '']}
+    
+    #variable correspondances - [from_qname, value, to_qname, value]
+    VC1 = ['volume', 'max', 'outflow', 'max']
+    VC2 = ['outflow', 'max', 'volume', 'max']
+    VC3 = ['volume', 'zero', 'outflow', 'zero']
+    VC4 = ['outflow', 'zero', 'volume', 'zero']
+    
+    VC5 = ['pressure', 'max', 'outflow', 'max']
+    VC6 = ['outflow', 'max', 'pressure', 'max']
+    VC7 = ['pressure', 'zero', 'outflow', 'zero']
+    VC8 = ['outflow', 'zero', 'pressure', 'zero']
+    
+    VC9 = ['height', 'max', 'outflow', 'max']
+    VC10 = ['outflow', 'max', 'height', 'max']
+    VC11 = ['height', 'zero', 'outflow', 'zero']
+    VC12 = ['outflow', 'zero', 'height', 'zero']
+    VC_list = [VC1]+[VC2]+[VC3]+[VC4] +[VC5]+[VC6]+[VC7]+[VC8] + [VC9]+[VC10]+[VC11]+[VC12] 
+    
+    #influences - [qname, dname]
+    I1 = ['inflow', 'volume', '+']
+    I2 = ['outflow', 'volume', '-']
+    I_list = [I1]+[I2]
+    
+    #proportionalities(positive) - [dname, dname]
+    P3 = ['pressure', 'outflow']
+    P1 = ['volume', 'height']
+    P2 = ['height', 'pressure']
+    P_list = [P1, P2, P3]
+    
+def define_problem_2():
+    #quantities format -> ['name', quantity_space]
+    global quantities
+    global VC_list
+    global I_list
+    global P_list
+    quantities = {'inflow': [zp, 'increasing'], 'volume': [zpm, ''],'outflow': [zpm, '']}
+    
+    #variable correspondances - [from_qname, value, to_qname, value]
+    VC1 = ['volume', 'max', 'outflow', 'max']
+    VC2 = ['outflow', 'max', 'volume', 'max']
+    VC3 = ['volume', 'zero', 'outflow', 'zero']
+    VC4 = ['outflow', 'zero', 'volume', 'zero']
+    VC_list = [VC1]+[VC2]+[VC3]+[VC4]
+    
+    #influences - [qname, dname]
+    I1 = ['inflow', 'volume', '+']
+    I2 = ['outflow', 'volume', '-']
+    I_list = [I1]+[I2]
+    
+    #proportionalities(positive) - [dname, dname]
+    P1 = ['volume', 'outflow']
+    P_list = [P1]
 
 #START PROGRAM
 if __name__ == "__main__":
+    define_problem_1()
     start()
