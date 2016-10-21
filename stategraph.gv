@@ -1,0 +1,79 @@
+// State-Graph
+digraph {
+	B [label="B
+volume: [zero, 0]
+ pressure: [zero, 0]
+ outflow: [zero, 0]
+ inflow: [zero, +]
+ height: [zero, 0]"]
+	C [label="C
+volume: [zero, +]
+ pressure: [zero, +]
+ outflow: [zero, +]
+ inflow: [plus, +]
+ height: [zero, +]"]
+		B -> C
+	D [label="D
+volume: [plus, +]
+ pressure: [plus, +]
+ outflow: [plus, +]
+ inflow: [plus, +]
+ height: [plus, +]"]
+		C -> D
+	E [label="E
+volume: [plus, -]
+ pressure: [plus, -]
+ outflow: [plus, -]
+ inflow: [zero, +]
+ height: [plus, -]"]
+	F [label="F
+volume: [plus, -]
+ pressure: [plus, -]
+ outflow: [plus, -]
+ inflow: [plus, +]
+ height: [plus, -]"]
+		E -> F
+	G [label="G
+volume: [plus, 0]
+ pressure: [plus, 0]
+ outflow: [plus, 0]
+ inflow: [plus, +]
+ height: [plus, 0]"]
+		F -> G
+		G -> F
+		G -> D
+	H [label="H
+volume: [max, 0]
+ pressure: [max, 0]
+ outflow: [max, 0]
+ inflow: [plus, +]
+ height: [max, 0]"]
+		D -> H
+		D -> G
+	I [label="I
+volume: [max, -]
+ pressure: [max, -]
+ outflow: [max, -]
+ inflow: [zero, +]
+ height: [max, -]"]
+		I -> F
+	J [label="J
+volume: [max, -]
+ pressure: [max, -]
+ outflow: [max, -]
+ inflow: [plus, +]
+ height: [max, -]"]
+		J -> F
+		H -> J
+	K [label="K
+Start node"]
+		K -> B
+		K -> C
+		K -> E
+		K -> F
+		K -> G
+		K -> D
+		K -> I
+		K -> J
+		K -> H
+}
