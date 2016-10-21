@@ -20,48 +20,10 @@ volume: [zero, 0]
 
 parent:
 
-volume: [zero, 0]
- pressure: [zero, 0]
- outflow: [zero, 0]
- inflow: [zero, +]
- height: [zero, 0]
-
-children: (1)
-
-volume: [zero, +]
- pressure: [zero, +]
- outflow: [zero, +]
- inflow: [plus, +]
- height: [zero, +]
-
-
-====================
-
-parent:
-
 volume: [zero, +]
  pressure: [zero, +]
  outflow: [zero, +]
  inflow: [plus, -]
- height: [zero, +]
-
-children: (1)
-
-volume: [plus, +]
- pressure: [plus, +]
- outflow: [plus, +]
- inflow: [plus, -]
- height: [plus, +]
-
-
-====================
-
-parent:
-
-volume: [zero, +]
- pressure: [zero, +]
- outflow: [zero, +]
- inflow: [plus, 0]
  height: [zero, +]
 
 children: (1)
@@ -80,6 +42,25 @@ parent:
 volume: [zero, +]
  pressure: [zero, +]
  outflow: [zero, +]
+ inflow: [plus, 0]
+ height: [zero, +]
+
+children: (1)
+
+volume: [plus, +]
+ pressure: [plus, +]
+ outflow: [plus, +]
+ inflow: [plus, -]
+ height: [plus, +]
+
+
+====================
+
+parent:
+
+volume: [zero, +]
+ pressure: [zero, +]
+ outflow: [zero, +]
  inflow: [plus, +]
  height: [zero, +]
 
@@ -88,7 +69,7 @@ children: (1)
 volume: [plus, +]
  pressure: [plus, +]
  outflow: [plus, +]
- inflow: [plus, +]
+ inflow: [plus, 0]
  height: [plus, +]
 
 
@@ -124,16 +105,28 @@ parent:
 volume: [plus, -]
  pressure: [plus, -]
  outflow: [plus, -]
- inflow: [zero, +]
+ inflow: [plus, -]
  height: [plus, -]
 
-children: (1)
+children: (3)
 
 volume: [plus, -]
  pressure: [plus, -]
  outflow: [plus, -]
- inflow: [plus, +]
+ inflow: [zero, 0]
  height: [plus, -]
+
+volume: [plus, -]
+ pressure: [plus, -]
+ outflow: [plus, -]
+ inflow: [plus, 0]
+ height: [plus, -]
+
+volume: [plus, 0]
+ pressure: [plus, 0]
+ outflow: [plus, 0]
+ inflow: [plus, 0]
+ height: [plus, 0]
 
 
 ====================
@@ -143,8 +136,70 @@ parent:
 volume: [plus, -]
  pressure: [plus, -]
  outflow: [plus, -]
+ inflow: [plus, 0]
+ height: [plus, -]
+
+children: (4)
+
+volume: [plus, -]
+ pressure: [plus, -]
+ outflow: [plus, -]
  inflow: [plus, -]
  height: [plus, -]
+
+volume: [plus, -]
+ pressure: [plus, -]
+ outflow: [plus, -]
+ inflow: [plus, +]
+ height: [plus, -]
+
+volume: [plus, 0]
+ pressure: [plus, 0]
+ outflow: [plus, 0]
+ inflow: [plus, -]
+ height: [plus, 0]
+
+volume: [plus, 0]
+ pressure: [plus, 0]
+ outflow: [plus, 0]
+ inflow: [plus, +]
+ height: [plus, 0]
+
+
+====================
+
+parent:
+
+volume: [plus, -]
+ pressure: [plus, -]
+ outflow: [plus, -]
+ inflow: [plus, +]
+ height: [plus, -]
+
+children: (2)
+
+volume: [plus, -]
+ pressure: [plus, -]
+ outflow: [plus, -]
+ inflow: [plus, 0]
+ height: [plus, -]
+
+volume: [plus, 0]
+ pressure: [plus, 0]
+ outflow: [plus, 0]
+ inflow: [plus, 0]
+ height: [plus, 0]
+
+
+====================
+
+parent:
+
+volume: [plus, 0]
+ pressure: [plus, 0]
+ outflow: [plus, 0]
+ inflow: [plus, -]
+ height: [plus, 0]
 
 children: (4)
 
@@ -163,88 +218,14 @@ volume: [plus, -]
 volume: [plus, 0]
  pressure: [plus, 0]
  outflow: [plus, 0]
- inflow: [plus, -]
- height: [plus, 0]
-
-volume: [plus, 0]
- pressure: [plus, 0]
- outflow: [plus, 0]
  inflow: [plus, 0]
  height: [plus, 0]
 
-
-====================
-
-parent:
-
-volume: [plus, -]
- pressure: [plus, -]
- outflow: [plus, -]
+volume: [plus, +]
+ pressure: [plus, +]
+ outflow: [plus, +]
  inflow: [plus, 0]
- height: [plus, -]
-
-children: (5)
-
-volume: [plus, -]
- pressure: [plus, -]
- outflow: [plus, -]
- inflow: [plus, -]
- height: [plus, -]
-
-volume: [plus, -]
- pressure: [plus, -]
- outflow: [plus, -]
- inflow: [plus, +]
- height: [plus, -]
-
-volume: [plus, 0]
- pressure: [plus, 0]
- outflow: [plus, 0]
- inflow: [plus, -]
- height: [plus, 0]
-
-volume: [plus, 0]
- pressure: [plus, 0]
- outflow: [plus, 0]
- inflow: [plus, 0]
- height: [plus, 0]
-
-volume: [plus, 0]
- pressure: [plus, 0]
- outflow: [plus, 0]
- inflow: [plus, +]
- height: [plus, 0]
-
-
-====================
-
-parent:
-
-volume: [plus, -]
- pressure: [plus, -]
- outflow: [plus, -]
- inflow: [plus, +]
- height: [plus, -]
-
-children: (3)
-
-volume: [plus, -]
- pressure: [plus, -]
- outflow: [plus, -]
- inflow: [plus, 0]
- height: [plus, -]
-
-volume: [plus, 0]
- pressure: [plus, 0]
- outflow: [plus, 0]
- inflow: [plus, 0]
- height: [plus, 0]
-
-volume: [plus, 0]
- pressure: [plus, 0]
- outflow: [plus, 0]
- inflow: [plus, +]
- height: [plus, 0]
+ height: [plus, +]
 
 
 ====================
@@ -254,7 +235,7 @@ parent:
 volume: [plus, 0]
  pressure: [plus, 0]
  outflow: [plus, 0]
- inflow: [plus, -]
+ inflow: [plus, 0]
  height: [plus, 0]
 
 children: (6)
@@ -262,62 +243,7 @@ children: (6)
 volume: [plus, -]
  pressure: [plus, -]
  outflow: [plus, -]
- inflow: [zero, 0]
- height: [plus, -]
-
-volume: [plus, -]
- pressure: [plus, -]
- outflow: [plus, -]
  inflow: [plus, -]
- height: [plus, -]
-
-volume: [plus, -]
- pressure: [plus, -]
- outflow: [plus, -]
- inflow: [plus, 0]
- height: [plus, -]
-
-volume: [plus, 0]
- pressure: [plus, 0]
- outflow: [plus, 0]
- inflow: [plus, 0]
- height: [plus, 0]
-
-volume: [plus, +]
- pressure: [plus, +]
- outflow: [plus, +]
- inflow: [plus, -]
- height: [plus, +]
-
-volume: [plus, +]
- pressure: [plus, +]
- outflow: [plus, +]
- inflow: [plus, 0]
- height: [plus, +]
-
-
-====================
-
-parent:
-
-volume: [plus, 0]
- pressure: [plus, 0]
- outflow: [plus, 0]
- inflow: [plus, 0]
- height: [plus, 0]
-
-children: (8)
-
-volume: [plus, -]
- pressure: [plus, -]
- outflow: [plus, -]
- inflow: [plus, -]
- height: [plus, -]
-
-volume: [plus, -]
- pressure: [plus, -]
- outflow: [plus, -]
- inflow: [plus, 0]
  height: [plus, -]
 
 volume: [plus, -]
@@ -342,12 +268,6 @@ volume: [plus, +]
  pressure: [plus, +]
  outflow: [plus, +]
  inflow: [plus, -]
- height: [plus, +]
-
-volume: [plus, +]
- pressure: [plus, +]
- outflow: [plus, +]
- inflow: [plus, 0]
  height: [plus, +]
 
 volume: [plus, +]
@@ -367,18 +287,12 @@ volume: [plus, 0]
  inflow: [plus, +]
  height: [plus, 0]
 
-children: (5)
+children: (3)
 
 volume: [plus, -]
  pressure: [plus, -]
  outflow: [plus, -]
  inflow: [plus, 0]
- height: [plus, -]
-
-volume: [plus, -]
- pressure: [plus, -]
- outflow: [plus, -]
- inflow: [plus, +]
  height: [plus, -]
 
 volume: [plus, 0]
@@ -393,12 +307,6 @@ volume: [plus, +]
  inflow: [plus, 0]
  height: [plus, +]
 
-volume: [plus, +]
- pressure: [plus, +]
- outflow: [plus, +]
- inflow: [plus, +]
- height: [plus, +]
-
 
 ====================
 
@@ -410,25 +318,13 @@ volume: [plus, +]
  inflow: [plus, -]
  height: [plus, +]
 
-children: (5)
-
-volume: [max, 0]
- pressure: [max, 0]
- outflow: [max, 0]
- inflow: [plus, -]
- height: [max, 0]
+children: (3)
 
 volume: [max, 0]
  pressure: [max, 0]
  outflow: [max, 0]
  inflow: [plus, 0]
  height: [max, 0]
-
-volume: [plus, 0]
- pressure: [plus, 0]
- outflow: [plus, 0]
- inflow: [plus, -]
- height: [plus, 0]
 
 volume: [plus, 0]
  pressure: [plus, 0]
@@ -453,18 +349,12 @@ volume: [plus, +]
  inflow: [plus, 0]
  height: [plus, +]
 
-children: (8)
+children: (6)
 
 volume: [max, 0]
  pressure: [max, 0]
  outflow: [max, 0]
  inflow: [plus, -]
- height: [max, 0]
-
-volume: [max, 0]
- pressure: [max, 0]
- outflow: [max, 0]
- inflow: [plus, 0]
  height: [max, 0]
 
 volume: [max, 0]
@@ -477,12 +367,6 @@ volume: [plus, 0]
  pressure: [plus, 0]
  outflow: [plus, 0]
  inflow: [plus, -]
- height: [plus, 0]
-
-volume: [plus, 0]
- pressure: [plus, 0]
- outflow: [plus, 0]
- inflow: [plus, 0]
  height: [plus, 0]
 
 volume: [plus, 0]
@@ -514,7 +398,7 @@ volume: [plus, +]
  inflow: [plus, +]
  height: [plus, +]
 
-children: (5)
+children: (3)
 
 volume: [max, 0]
  pressure: [max, 0]
@@ -522,22 +406,10 @@ volume: [max, 0]
  inflow: [plus, 0]
  height: [max, 0]
 
-volume: [max, 0]
- pressure: [max, 0]
- outflow: [max, 0]
- inflow: [plus, +]
- height: [max, 0]
-
 volume: [plus, 0]
  pressure: [plus, 0]
  outflow: [plus, 0]
  inflow: [plus, 0]
- height: [plus, 0]
-
-volume: [plus, 0]
- pressure: [plus, 0]
- outflow: [plus, 0]
- inflow: [plus, +]
  height: [plus, 0]
 
 volume: [plus, +]
@@ -562,26 +434,7 @@ children: (1)
 volume: [plus, -]
  pressure: [plus, -]
  outflow: [plus, -]
- inflow: [zero, 0]
- height: [plus, -]
-
-
-====================
-
-parent:
-
-volume: [max, -]
- pressure: [max, -]
- outflow: [max, -]
  inflow: [zero, +]
- height: [max, -]
-
-children: (1)
-
-volume: [plus, -]
- pressure: [plus, -]
- outflow: [plus, -]
- inflow: [plus, +]
  height: [plus, -]
 
 
@@ -600,7 +453,7 @@ children: (1)
 volume: [plus, -]
  pressure: [plus, -]
  outflow: [plus, -]
- inflow: [plus, -]
+ inflow: [plus, 0]
  height: [plus, -]
 
 
@@ -619,7 +472,7 @@ children: (1)
 volume: [plus, -]
  pressure: [plus, -]
  outflow: [plus, -]
- inflow: [plus, 0]
+ inflow: [plus, -]
  height: [plus, -]
 
 
@@ -638,7 +491,7 @@ children: (1)
 volume: [plus, -]
  pressure: [plus, -]
  outflow: [plus, -]
- inflow: [plus, +]
+ inflow: [plus, 0]
  height: [plus, -]
 
 
@@ -650,86 +503,6 @@ volume: [max, 0]
  pressure: [max, 0]
  outflow: [max, 0]
  inflow: [plus, -]
- height: [max, 0]
-
-children: (4)
-
-volume: [max, -]
- pressure: [max, -]
- outflow: [max, -]
- inflow: [zero, 0]
- height: [max, -]
-
-volume: [max, -]
- pressure: [max, -]
- outflow: [max, -]
- inflow: [plus, -]
- height: [max, -]
-
-volume: [max, -]
- pressure: [max, -]
- outflow: [max, -]
- inflow: [plus, 0]
- height: [max, -]
-
-volume: [max, 0]
- pressure: [max, 0]
- outflow: [max, 0]
- inflow: [plus, 0]
- height: [max, 0]
-
-
-====================
-
-parent:
-
-volume: [max, 0]
- pressure: [max, 0]
- outflow: [max, 0]
- inflow: [plus, 0]
- height: [max, 0]
-
-children: (5)
-
-volume: [max, -]
- pressure: [max, -]
- outflow: [max, -]
- inflow: [plus, -]
- height: [max, -]
-
-volume: [max, -]
- pressure: [max, -]
- outflow: [max, -]
- inflow: [plus, 0]
- height: [max, -]
-
-volume: [max, -]
- pressure: [max, -]
- outflow: [max, -]
- inflow: [plus, +]
- height: [max, -]
-
-volume: [max, 0]
- pressure: [max, 0]
- outflow: [max, 0]
- inflow: [plus, -]
- height: [max, 0]
-
-volume: [max, 0]
- pressure: [max, 0]
- outflow: [max, 0]
- inflow: [plus, +]
- height: [max, 0]
-
-
-====================
-
-parent:
-
-volume: [max, 0]
- pressure: [max, 0]
- outflow: [max, 0]
- inflow: [plus, +]
  height: [max, 0]
 
 children: (3)
@@ -737,13 +510,75 @@ children: (3)
 volume: [max, -]
  pressure: [max, -]
  outflow: [max, -]
+ inflow: [zero, 0]
+ height: [max, -]
+
+volume: [max, -]
+ pressure: [max, -]
+ outflow: [max, -]
  inflow: [plus, 0]
+ height: [max, -]
+
+volume: [max, 0]
+ pressure: [max, 0]
+ outflow: [max, 0]
+ inflow: [plus, 0]
+ height: [max, 0]
+
+
+====================
+
+parent:
+
+volume: [max, 0]
+ pressure: [max, 0]
+ outflow: [max, 0]
+ inflow: [plus, 0]
+ height: [max, 0]
+
+children: (4)
+
+volume: [max, -]
+ pressure: [max, -]
+ outflow: [max, -]
+ inflow: [plus, -]
  height: [max, -]
 
 volume: [max, -]
  pressure: [max, -]
  outflow: [max, -]
  inflow: [plus, +]
+ height: [max, -]
+
+volume: [max, 0]
+ pressure: [max, 0]
+ outflow: [max, 0]
+ inflow: [plus, -]
+ height: [max, 0]
+
+volume: [max, 0]
+ pressure: [max, 0]
+ outflow: [max, 0]
+ inflow: [plus, +]
+ height: [max, 0]
+
+
+====================
+
+parent:
+
+volume: [max, 0]
+ pressure: [max, 0]
+ outflow: [max, 0]
+ inflow: [plus, +]
+ height: [max, 0]
+
+children: (2)
+
+volume: [max, -]
+ pressure: [max, -]
+ outflow: [max, -]
+ inflow: [plus, 0]
  height: [max, -]
 
 volume: [max, 0]
