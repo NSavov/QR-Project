@@ -320,7 +320,7 @@ def get_connections(all_states):
             
             if trace and trace_iter2:
                     if not not children:
-                        tfile.write( (tc+1)*tab + "Example: " + str(len(children)) + " found children: " + '\n')
+                        tfile.write( (tc+1)*tab + "Example: " + str(len(children)) + " found child(ren): " + '\n')
                     for child in children:
                         tfile.write( (tc+2)*tab + get_state_string(all_states[child], ' ') + '\n')
             for child_ind in children:
