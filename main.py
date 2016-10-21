@@ -16,7 +16,6 @@ import pprint
 trace = True
 tc = 0
 tab = '    '
-tr_iter = True
 trace_iter2 = True
 trace_iter3 = True
 
@@ -85,13 +84,13 @@ def get_arrow(all_states, new_state, exogenous, non_changable_derivs):
     flag = False
     tc += 1
     if trace and trace_iter3:
-                print tc*tab + "Filter the possible matching children from all valid states:"
+                tfile.write( tc*tab + "Filter the possible matching children from all valid states:" + '\n')
     
     tc += 1
     if trace and trace_iter3:
-                print tc*tab + "Filter out all the states not matching the new quantities"
-                print tc*tab + "Filter out all the states with different derivatives defined as non-changable"
-                print tc*tab + "Filter out all the states which doesn't match an exogenous change"
+                tfile.write( tc*tab + "Filter out all the states not matching the new quantities" + '\n')
+                tfile.write( tc*tab + "Filter out all the states with different derivatives defined as non-changable" + '\n')
+                tfile.write( tc*tab + "Filter out all the states which doesn't match an exogenous change" + '\n')
     #quantity filtering
     for state in all_states:
         for key, value in new_state.items():
@@ -123,8 +122,6 @@ def get_arrow(all_states, new_state, exogenous, non_changable_derivs):
             flag = True
             continue
         
-        # print state
-        
         for key, value in state.items():
             if abs(derivs.index(state[key][1]) - derivs.index(new_state[key][1])) > 1:
                 flag = False
@@ -144,8 +141,6 @@ def subtract_one(state, quantity):
     index = quantities[quantity][QSPACE_IND].index(state[quantity][0])
     if index != 0:
         new_state[quantity][0] = quantities[quantity][QSPACE_IND][index-1] 
-    # if new_state[quantity][0] == quantities[quantity][QSPACE_IND][0] :
-        # new_state[quantity][1] = '0'
     return new_state
     
 def add_one(state, quantity):
@@ -232,24 +227,22 @@ def get_const_landmark_quants(state):
 def get_connections(all_states):
     global tc
     global trace_iter2
-    # global trace_iter1
-    if trace:
-        print tc*tab + "Find all the exogenous quantities"
+    
     exogenous = get_exogenous()
-    
     if trace:
-        print tc*tab + "Find all derivatives that can be inferred from influences and proportionalities"
+        tfile.write( tc*tab + "Find all exogenous quantities:" + str(exogenous) + '\n')
+    
     inferred_derivs = get_inferred_derivs()
-    
     if trace:
-        print tc*tab + "Based on these find all the derivatives that cannot change from influences and proportionalities"
+        tfile.write( tc*tab + "Find all derivatives that can be inferred from influences and proportionalities: " + str(inferred_derivs) + '\n')
+    
+    
     non_changable_derivs = list(set(quantities.keys()) - set(inferred_derivs) - set(exogenous))
-    # instant_children = []
-    # pprint.pprint(inferred_derivs)
-    
+    if trace:
+        tfile.write( tc*tab + "Based on these find all the derivatives that cannot change from influences and proportionalities: "  + str(non_changable_derivs) + '\n')
     
     if trace:
-        print tc*tab + "Assume these non-changable derivatives to be random exogenous"
+        tfile.write( tc*tab + "Assume these non-changable derivatives to be random exogenous" + '\n')
     for derivative in non_changable_derivs:
         quantities[derivative][EXOGENOUS_IND] = 'random'
         exogenous.append(derivative)
@@ -264,8 +257,8 @@ def get_connections(all_states):
     neighbours_list[-1].extend([all_states.index(current_state) for current_state in current_states ])
     
     if trace:
-        print tc*tab + "For every state:"
-    
+        tfile.write( tc*tab + "For every state (example values are for first state only):" + '\n')
+    tc +=1
     trace_iter = True
     for state in current_states:
 
@@ -273,35 +266,40 @@ def get_connections(all_states):
         # print const_landmark_quants
         
         if trace and trace_iter:
-            print tc*tab + "Get the quantities that can change in the next step"
+            tfile.write( tc*tab + "Example state: " + get_state_string(state, ' ') + '\n')
+            tfile.write( tc*tab + "Get the quantities that can change in the next step: " + str(const_landmark_quants) + '\n')
         
         if trace and trace_iter:
-            print tc*tab + "If there are no instantaneous changes: get a list of valid states with changes in every possible combination of changable quantities"
+            tfile.write( tc*tab + "If there are no instantaneous changes: get a list of valid states with changes in every possible combination of changable quantities" + '\n')
         
         if trace and trace_iter:
-            print tc*tab + "If there are instantaneous changes - get one state with all of them applied"
+            tfile.write( tc*tab + "If there are instantaneous changes - get one state with all of them applied" + '\n')
             
         quants, instant_quants = get_changable_quantities(state)
         if not instant_quants:
             combinations = get_changeable_combinations(quants)
             new_states = alter_quantities(state, combinations)
             new_states.append(state)
+            if trace and trace_iter:
+                tfile.write( (tc+1)*tab + "Example: Non-instantaneous transition, possible changed quantities: " + '\n')
+                for new_state in new_states:
+                    tfile.write( (tc+2)*tab + get_state_string(new_state,' ') + '\n')
         else:
-            # instant_combinations = get_changeable_combinations(instant_quants)
             new_states = alter_quantities(state, [instant_quants])
-            
-        
-        # if not instant_quants and INST_CHILD in state.keys():
-            # children.extend(get_arrow(all_states, state, exogenous, []))
+            if trace and trace_iter:
+                if not new_states:
+                    tfile.write( (tc+1)*tab + "Example: Instantenious transition - no possible next state" + '\n')
+                else:
+                    tfile.write( (tc+1)*tab + "Example: Instantenious transition, next state (only magnitutes changed):" + get_state_string(new_states[0], ' ') + '\n')
         
         if trace and trace_iter2:
-            print tc*tab + "For all states with changed quantities:"
+            tfile.write( tc*tab + "For all states with changed quantities:" + '\n')
+        tc +=1
         for new_state in new_states:
             if trace and trace_iter2:
-                print tc*tab + "In case of instant change - find the next state with least amount of derivative changes"
-                print tc*tab + "Otherwise: find all possible children without restrictions"
+                tfile.write( tc*tab + "In case of instant change - find the next state with least amount of derivative changes" + '\n')
+                tfile.write( tc*tab + "Otherwise: find all possible children without restrictions" + '\n')
             if not not instant_quants:
-                    
                 children = get_arrow(all_states, new_state, exogenous, state.keys())
                 if not children:
                     const_inst_derivs = []
@@ -311,15 +309,19 @@ def get_connections(all_states):
                     children = get_arrow(all_states, new_state, exogenous, const_inst_derivs)
                     if not not children:
                         children = [children[0]]
+                
             else:
                 children = get_arrow(all_states, new_state, exogenous, [])
             
             if trace and trace_iter2:
-                print tc*tab + "Connect the state with the found new states"
+                tfile.write( tc*tab + "Connect the state with the found new states" + '\n')
             
+            if trace and trace_iter2:
+                    if not not children:
+                        tfile.write( (tc+1)*tab + "Example: " + str(len(children)) + " found children: " + '\n')
+                    for child in children:
+                        tfile.write( (tc+2)*tab + get_state_string(all_states[child], ' ') + '\n')
             for child_ind in children:
-                # if not not instant_quants:
-                    # instant_children.append(all_states[child_ind])
                 if all_states[child_ind] not in current_states:
                     current_states.append(all_states[child_ind])
             if len(children)>0 :
@@ -329,6 +331,8 @@ def get_connections(all_states):
                 neighbours_list[ind].extend(children)
             trace_iter2 = False
         trace_iter = False
+        tc -= 1
+    tc -= 1
     # pprint.pprint(neighbours_list)
     return neighbours_list
 
@@ -346,8 +350,6 @@ def valid_proportionalities(state):
     return True
 
 def valid_influences(state):
-    # if trace:
-        # print tc*tab + "Check if the influences are satisfied"
     influences = {}
     possible_derivs = {}
     
@@ -380,8 +382,6 @@ def valid_influences(state):
     return True
 
 def valid_vcs(state):
-    # if trace:
-        # print tc*tab + "Check if the VCs are satisfied"
     for vc in VC_list:
         if (state[vc[0]][0] == vc[1]) and (state[vc[2]][0] != vc[3]):
             return False
@@ -416,44 +416,50 @@ def set_states():
     perm_sets = []
     
     if trace:
-        print tc*tab + "Generating all possible (valid and invalid) states"
+        tfile.write( tc*tab + "Generating all possible (valid and invalid) states" + '\n')
     
     
     for name, quantity in quantities.items():
         perm_sets.append(quantity[QSPACE_IND])
         perm_sets.append(derivs)
-    # print perm_sets
+        
     all_combinations = list(itertools.product(*perm_sets))
     all_combinations_lst = [list(elem) for elem in all_combinations]
     all_states = convert_to_states(all_combinations_lst)
-    
     if trace:
-        print tc*tab + "Select only the valid states. For every state:"
+        tfile.write( tc*tab + str(len(all_states)) + " possible (valid and invalid) states found" + '\n')
+        
+    if trace:
+        tfile.write( tc*tab + "Select only the valid states. For every state:" + '\n')
     
     tc += 1
     
     if trace:
-        print tc*tab + "Check if the VCs are satisfied"
-        print tc*tab + "Check if the influences are satisfied"
-        print tc*tab + "Check if the proportionalities are satisfied"
-        print tc*tab + "Check if the algorithm constraints are satisfied"
+        tfile.write( tc*tab + "Check if the VCs are satisfied" + '\n')
+        tfile.write( tc*tab + "Check if the influences are satisfied" + '\n')
+        tfile.write( tc*tab + "Check if the proportionalities are satisfied" + '\n')
+        tfile.write( tc*tab + "Check if the algorithm constraints are satisfied" + '\n')
     all_val_states = []
     for state in all_states:
         if valid(state):
             all_val_states.append(state)
     tc -= 1
+    
+    if trace:
+        tfile.write( tc*tab + str(len(all_val_states)) + " possible valid states found" + '\n')
+        
     return all_val_states
     
 def start():
     global tc
     if trace:
-        print tc*tab + "Find all states that are possible for this input"
+        tfile.write( tc*tab + "Find all states that are possible for this input\n")
     tc += 1
     all_states = set_states()
     tc -= 1
     
     if trace:
-        print tc*tab + "Find the edges of the graph"
+        tfile.write( tc*tab + "Find the edges of the graph" + '\n')
     
     tc += 1
     neighbours_list = get_connections(all_states)
@@ -468,8 +474,6 @@ def start():
             else:
                 neighs.append(str(all_states[ind]))
         neighbours_list_str.append(neighs)
-    
-    # pprint.pprint(neighbours_list_str)
     
     G=nx.DiGraph()
     
@@ -493,6 +497,7 @@ def start():
     # plt.show()
     app = Viewer(G)
     app.mainloop()
+    tfile.close()
     
 def define_problem_1():
     global quantities
@@ -555,5 +560,7 @@ def define_problem_2():
 
 #START PROGRAM
 if __name__ == "__main__":
+    global tfile
+    tfile = open('trace.txt', 'w')
     define_problem_1()
     start()
