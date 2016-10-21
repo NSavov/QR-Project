@@ -75,7 +75,7 @@ def get_next_derivs_exogenous(quantity_vals, exog):
             possible_derivs = ['+']
             
     elif type == 'random':
-        possible_derivs = derivs
+        possible_derivs = list(set(derivs) - set(quantity_vals[1]))
     return possible_derivs
 
 def get_arrow(all_states, new_state, exogenous, non_changable_derivs):
