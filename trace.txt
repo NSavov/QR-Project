@@ -13,11 +13,12 @@ Find the edges of the graph
     Based on these find all the derivatives that cannot change from influences and proportionalities: []
     Assume these non-changable derivatives to be random exogenous
     For every state (example values are for first state only):
-        Example state: volume zero 0 pressure zero 0 outflow zero 0 inflow zero + height zero 0 
-        Get the quantities that can change in the next step: ['volume', 'pressure', 'outflow', 'height']
+        Example state: volume zero 0 pressure zero 0 outflow zero 0 inflow zero 0 height zero 0 
+        Get the quantities that can change in the next step: ['volume', 'pressure', 'outflow', 'inflow', 'height']
         If there are no instantaneous changes: get a list of valid states with changes in every possible combination of changable quantities
         If there are instantaneous changes - get one state with all of them applied
-            Example: Instantenious transition, next state (only magnitutes changed):volume zero 0 pressure zero 0 outflow zero 0 inflow plus + height zero 0 
+            Example: Non-instantaneous transition, possible changed quantities: 
+                volume zero 0 pressure zero 0 outflow zero 0 inflow zero 0 height zero 0 
         For all states with changed quantities:
             In case of instant change - find the next state with least amount of derivative changes
             Otherwise: find all possible children without restrictions
@@ -28,4 +29,4 @@ Find the edges of the graph
                     Filter out all the states that have incontinuous gradients
             Connect the state with the found new states
                 Example: 1 found child(ren): 
-                    volume zero + pressure zero + outflow zero + inflow plus + height zero + 
+                    volume zero 0 pressure zero 0 outflow zero 0 inflow zero + height zero 0 

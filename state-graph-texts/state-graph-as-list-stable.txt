@@ -1,0 +1,208 @@
+
+parent:
+
+volume: [zero, +]
+ pressure: [zero, +]
+ outflow: [zero, +]
+ inflow: [plus, 0]
+ height: [zero, +]
+
+children: (1)
+
+volume: [plus, +]
+ pressure: [plus, +]
+ outflow: [plus, +]
+ inflow: [plus, 0]
+ height: [plus, +]
+
+
+====================
+
+parent:
+
+volume: [plus, -]
+ pressure: [plus, -]
+ outflow: [plus, -]
+ inflow: [plus, 0]
+ height: [plus, -]
+
+children: (1)
+
+volume: [plus, 0]
+ pressure: [plus, 0]
+ outflow: [plus, 0]
+ inflow: [plus, 0]
+ height: [plus, 0]
+
+
+====================
+
+parent:
+
+volume: [plus, 0]
+ pressure: [plus, 0]
+ outflow: [plus, 0]
+ inflow: [plus, 0]
+ height: [plus, 0]
+
+children: (2)
+
+volume: [plus, -]
+ pressure: [plus, -]
+ outflow: [plus, -]
+ inflow: [plus, 0]
+ height: [plus, -]
+
+volume: [plus, +]
+ pressure: [plus, +]
+ outflow: [plus, +]
+ inflow: [plus, 0]
+ height: [plus, +]
+
+
+====================
+
+parent:
+
+volume: [plus, +]
+ pressure: [plus, +]
+ outflow: [plus, +]
+ inflow: [plus, 0]
+ height: [plus, +]
+
+children: (2)
+
+volume: [max, 0]
+ pressure: [max, 0]
+ outflow: [max, 0]
+ inflow: [plus, 0]
+ height: [max, 0]
+
+volume: [plus, 0]
+ pressure: [plus, 0]
+ outflow: [plus, 0]
+ inflow: [plus, 0]
+ height: [plus, 0]
+
+
+====================
+
+parent:
+
+volume: [max, -]
+ pressure: [max, -]
+ outflow: [max, -]
+ inflow: [zero, 0]
+ height: [max, -]
+
+children: (1)
+
+volume: [plus, -]
+ pressure: [plus, -]
+ outflow: [plus, -]
+ inflow: [zero, 0]
+ height: [plus, -]
+
+
+====================
+
+parent:
+
+volume: [max, -]
+ pressure: [max, -]
+ outflow: [max, -]
+ inflow: [plus, 0]
+ height: [max, -]
+
+children: (1)
+
+volume: [plus, -]
+ pressure: [plus, -]
+ outflow: [plus, -]
+ inflow: [plus, 0]
+ height: [plus, -]
+
+
+====================
+
+parent:
+
+volume: [max, 0]
+ pressure: [max, 0]
+ outflow: [max, 0]
+ inflow: [plus, 0]
+ height: [max, 0]
+
+children: (1)
+
+volume: [max, -]
+ pressure: [max, -]
+ outflow: [max, -]
+ inflow: [plus, 0]
+ height: [max, -]
+
+
+====================
+
+parent:
+
+Start
+
+children: (9)
+
+volume: [zero, 0]
+ pressure: [zero, 0]
+ outflow: [zero, 0]
+ inflow: [zero, 0]
+ height: [zero, 0]
+
+volume: [zero, +]
+ pressure: [zero, +]
+ outflow: [zero, +]
+ inflow: [plus, 0]
+ height: [zero, +]
+
+volume: [plus, -]
+ pressure: [plus, -]
+ outflow: [plus, -]
+ inflow: [zero, 0]
+ height: [plus, -]
+
+volume: [plus, -]
+ pressure: [plus, -]
+ outflow: [plus, -]
+ inflow: [plus, 0]
+ height: [plus, -]
+
+volume: [plus, 0]
+ pressure: [plus, 0]
+ outflow: [plus, 0]
+ inflow: [plus, 0]
+ height: [plus, 0]
+
+volume: [plus, +]
+ pressure: [plus, +]
+ outflow: [plus, +]
+ inflow: [plus, 0]
+ height: [plus, +]
+
+volume: [max, -]
+ pressure: [max, -]
+ outflow: [max, -]
+ inflow: [zero, 0]
+ height: [max, -]
+
+volume: [max, -]
+ pressure: [max, -]
+ outflow: [max, -]
+ inflow: [plus, 0]
+ height: [max, -]
+
+volume: [max, 0]
+ pressure: [max, 0]
+ outflow: [max, 0]
+ inflow: [plus, 0]
+ height: [max, 0]
+
+
+====================

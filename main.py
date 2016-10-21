@@ -497,47 +497,47 @@ def start():
 # decomment if pygraphiz package is installed only
 #################################################
     
-    neighbours_list_str = []
-    for neghbours in neighbours_list:
-        neighs = []
-        for ind in neghbours:
-            if ind == len(all_states):
-                neighs.append('Start')
-            else:
-                neighs.append(str(all_states[ind]))
-        neighbours_list_str.append(neighs)
-     
-    from graphviz import Digraph
-    from string import ascii_lowercase
-
-    dot = Digraph(comment='State-Graph')
-    existent_nodes = {}
-    unique_id = 0
-
-    for sequence in range(len(neighbours_list_str)):
-        if len(neighbours_list_str[sequence])>1:
-            parentname = neighbours_list_str[sequence][0]
-            if parentname not in existent_nodes:
-                unique_id += 1
-                parentid = ascii_lowercase[unique_id].upper()
-                existent_nodes[parentname] = parentid
-                plabelpart1 = parentid + '\n' 
-                plabelpart2 = get_string(parentname)
-                parentlabel = plabelpart1 + plabelpart2
-                dot.node(parentid, parentlabel)
-            for child in range(1, len(neighbours_list_str[sequence])):
-                childname = neighbours_list_str[sequence][child]
-                if childname not in existent_nodes:
-                    unique_id += 1
-                    childid = ascii_lowercase[unique_id].upper()
-                    existent_nodes[childname] = childid
-                    clabelpart1 = childid + '\n'
-                    clabelpart2 = get_string(childname)
-                    childlabel = clabelpart1 + clabelpart2
-                    dot.node(childid, childlabel)
-                dot.edge(existent_nodes[parentname], existent_nodes[childname])
-
-    dot.render('stategraph.gv', view=True)
+#    neighbours_list_str = []
+#    for neghbours in neighbours_list:
+#        neighs = []
+#        for ind in neghbours:
+#            if ind == len(all_states):
+#                neighs.append('Start')
+#            else:
+#                neighs.append(str(all_states[ind]))
+#        neighbours_list_str.append(neighs)
+#     
+#    from graphviz import Digraph
+#    from string import ascii_lowercase
+#
+#    dot = Digraph(comment='State-Graph')
+#    existent_nodes = {}
+#    unique_id = 0
+#
+#    for sequence in range(len(neighbours_list_str)):
+#        if len(neighbours_list_str[sequence])>1:
+#            parentname = neighbours_list_str[sequence][0]
+#            if parentname not in existent_nodes:
+#                unique_id += 1
+#                parentid = ascii_lowercase[unique_id].upper()
+#                existent_nodes[parentname] = parentid
+#                plabelpart1 = parentid + '\n' 
+#                plabelpart2 = get_string(parentname)
+#                parentlabel = plabelpart1 + plabelpart2
+#                dot.node(parentid, parentlabel)
+#            for child in range(1, len(neighbours_list_str[sequence])):
+#                childname = neighbours_list_str[sequence][child]
+#                if childname not in existent_nodes:
+#                    unique_id += 1
+#                    childid = ascii_lowercase[unique_id].upper()
+#                    existent_nodes[childname] = childid
+#                    clabelpart1 = childid + '\n'
+#                    clabelpart2 = get_string(childname)
+#                    childlabel = clabelpart1 + clabelpart2
+#                    dot.node(childid, childlabel)
+#                dot.edge(existent_nodes[parentname], existent_nodes[childname])
+#
+#    dot.render('stategraph.gv', view=True)
 
         
     
