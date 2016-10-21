@@ -12,7 +12,6 @@ import pprint
 #this algorithm only works with correct models
 
 # GLOBAL VARIABLES
-#! all of the global variable except for the const part should go
 
 #quantity spaces - const (not part of the input)
 zp = ['zero','plus']
@@ -26,7 +25,7 @@ exogenous_types = ['decreasing','stable', 'increasing', 'random']
 #quantities format -> ['name', quantity_space]
 QSPACE_IND = 0
 EXOGENOUS_IND = 1
-quantities = {'inflow': [zp, 'increasing'], 'volume': [zpm, ''],'outflow': [zpm, '']}
+quantities = {'inflow': [zp, 'random'], 'volume': [zpm, ''],'outflow': [zpm, '']}
 
 #these constraints are not part of the input - they are part of the algorithm
 C1 = ['zero','-']
@@ -77,7 +76,7 @@ def get_next_derivs_exogenous(quantity_vals, exog):
         possible_derivs = derivs
     return possible_derivs
 
-def get_arrow(all_states, new_state, exogenous):
+def get_arrow(all_states, new_state, exogenous, non_changable_derivs):
     children = []
     flag = False
     #quantity filtering
@@ -85,6 +84,16 @@ def get_arrow(all_states, new_state, exogenous):
         
         for key, value in new_state.items():
             if value[0] != state[key][0]:
+                flag = False
+                break
+        
+        if not flag:
+            flag = True
+            continue
+        
+        
+        for deriv_index in non_changable_derivs:
+            if new_state[deriv_index][1] != state[deriv_index][1]:
                 flag = False
                 break
         
@@ -102,6 +111,9 @@ def get_arrow(all_states, new_state, exogenous):
             flag = True
             continue
         
+        print state
+        print 
+        
         for key, value in state.items():
             if abs(derivs.index(state[key][1]) - derivs.index(new_state[key][1])) > 1:
                 flag = False
@@ -118,8 +130,8 @@ def subtract_one(state, quantity):
     index = quantities[quantity][QSPACE_IND].index(state[quantity][0])
     if index != 0:
         new_state[quantity][0] = quantities[quantity][QSPACE_IND][index-1] 
-    if new_state[quantity][0] == quantities[quantity][QSPACE_IND][0] :
-        new_state[quantity][1] = '0'
+    # if new_state[quantity][0] == quantities[quantity][QSPACE_IND][0] :
+        # new_state[quantity][1] = '0'
     return new_state
     
 def add_one(state, quantity):
@@ -200,6 +212,7 @@ def get_connections(all_states):
     exogenous = get_exogenous()
     inferred_derivs = get_inferred_derivs()
     non_changable_derivs = list(set(quantities.keys()) - set(inferred_derivs) - set(exogenous))
+    # instant_children = []
     
     for derivative in non_changable_derivs:
         quantities[derivative][EXOGENOUS_IND] = 'random'
@@ -210,24 +223,47 @@ def get_connections(all_states):
         for exog in exogenous:
             if state[exog][1] in get_start_derivs_exogenous(exog):
                 current_states.append(state)
+                
     neighbours_list = [[i] for i in range(len(all_states)+1) ]
     neighbours_list[-1].extend([all_states.index(current_state) for current_state in current_states ])
+    
     for state in current_states:
-        quants, insant_quants = get_changable_quantities(state)
-        if not insant_quants:
+        quants, instant_quants = get_changable_quantities(state)
+        if not instant_quants:
             combinations = get_changeable_combinations(quants)
             new_states = alter_quantities(state, combinations)
+            new_states.append(state)
         else:
-            # instant_combinations = get_changeable_combinations(insant_quants)
-            new_states = alter_quantities(state, [insant_quants])
+            # instant_combinations = get_changeable_combinations(instant_quants)
+            new_states = alter_quantities(state, [instant_quants])
+            
+        
+        # if not instant_quants and INST_CHILD in state.keys():
+            # children.extend(get_arrow(all_states, state, exogenous, []))
         
         for new_state in new_states:
-            children = get_arrow(all_states, new_state, exogenous)
+            if not not instant_quants:
+                children = get_arrow(all_states, new_state, exogenous, state.keys())
+                if not children:
+                    const_inst_derivs = []
+                    for inst_quant in instant_quants:
+                        if new_state[inst_quant][0] not in landmarks:
+                            const_inst_derivs.append(inst_quant)
+                    children = get_arrow(all_states, new_state, exogenous, const_inst_derivs)
+            else:
+                children = get_arrow(all_states, new_state, exogenous, [])
+            
             for child_ind in children:
+                # if not not instant_quants:
+                    # instant_children.append(all_states[child_ind])
                 if all_states[child_ind] not in current_states:
                     current_states.append(all_states[child_ind])
             if len(children)>0 :
-                neighbours_list[all_states.index(state)].extend(children)
+                ind = all_states.index(state)
+                if ind in children:
+                    children.remove(ind)
+                neighbours_list[ind].extend(children)
+    pprint.pprint(neighbours_list)
     return neighbours_list
 
 def valid_constraints(state):
@@ -320,6 +356,11 @@ def set_states():
             all_val_states.append(state)
 
     return all_val_states
+def get_state_string(state):
+    str = ""
+    for key, value in state.items():
+        str += key+" " + value[0] + " " + value[1] + '\n'
+    return str
     
 def start():
     all_states = set_states()
