@@ -570,6 +570,7 @@ def define_problem_1():
     I2 = ['outflow', 'volume', '-']
     I_list = [I1]+[I2]
     
+    #####!Note Due to bug in handling proportionalities the order in the list is important: first include the proportionality of the quantity which has an inference and then add every proportionality on the chain
     #proportionalities(positive) - [dname, dname]
     P3 = ['pressure', 'outflow']
     P1 = ['volume', 'height']
@@ -596,6 +597,7 @@ def define_problem_2():
     I2 = ['outflow', 'volume', '-']
     I_list = [I1]+[I2]
     
+        #####!Note Due to bug in handling proportionalities the order in the list is important: first include the proportionality of the quantity which has an inference and then add every proportionality on the chain
     #proportionalities(positive) - [dname, dname]
     P1 = ['volume', 'outflow']
     P_list = [P1]
