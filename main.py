@@ -4,9 +4,6 @@
 # 14/10/16
 import copy
 import itertools
-import networkx as nx
-import matplotlib.pyplot as plt
-from networkx_viewer import Viewer
 import pprint
 
 #this algorithm only works with correct models
@@ -49,10 +46,14 @@ I_list = []
 #proportionalities(positive) - [dname, dname]
 P_list = []
 
+def get_string(state):
+    string_state = state.replace('],',']\n').replace('{','').replace('}','').replace("'",'')
+    return string_state
+
 def get_state_string(state, eol):
     str = ""
     for key, value in state.items():
-        str += key+" " + value[0] + " " + value[1] + eol
+        str += key+" "+ value[0] + " "+ value[1] + eol
     return str
 
 def get_next_derivs_exogenous(quantity_vals, exog):
@@ -333,7 +334,6 @@ def get_connections(all_states):
         trace_iter = False
         tc -= 1
     tc -= 1
-    # pprint.pprint(neighbours_list)
     return neighbours_list
 
 def valid_constraints(state):
@@ -475,36 +475,77 @@ def start():
                 neighs.append(str(all_states[ind]))
         neighbours_list_str.append(neighs)
     
-    G=nx.DiGraph()
+    f = open('../state-graph-as-list.txt','w')    
+    for parent_list in neighbours_list_str:
+        if len(parent_list) > 1:
+            f.write('\nparent:\n\n')
+            parentstate = get_string(parent_list[0])
+            f.write("%s\n" % parentstate)
+            f.write('\nchildren: ('+str(len(parent_list)-1)+')\n\n')
+            for state in range(1,len(parent_list)):
+                state = get_string(parent_list[state])
+                f.write("%s\n\n" % state)
+                
+            f.write('\n====================\n')
+    f.close()
     
-    G.add_nodes_from([get_state_string(state, '\n') for state in all_states ])
-    G.add_node('Start')
-    for neghbours in neighbours_list[:-1]:
-        G.add_edges_from([(get_state_string(all_states[neghbours[0]], '\n'), get_state_string(all_states[neghbours[i]], '\n')) for i in range(1,len(neghbours))])
+    
+    
+#################################################
+# below code is used for the graph
+# decomment if pygraphiz package is installed only
+#################################################
+    
+    neighbours_list_str = []
+    for neghbours in neighbours_list:
+        neighs = []
+        for ind in neghbours:
+            if ind == len(all_states):
+                neighs.append('Start')
+            else:
+                neighs.append(str(all_states[ind]))
+        neighbours_list_str.append(neighs)
+     
+    from graphviz import Digraph
+    from string import ascii_lowercase
 
-    G.add_edges_from([('Start', get_state_string(all_states[neighbours_list[-1][i]], '\n')) for i in range(1,len(neighbours_list[-1]))])
-    G.remove_nodes_from(nx.isolates(G))
-    
-    # nx.write_gexf(G, 'graph.gexf')
-    # labels = {}
-    # for i in range(len(all_states)):
-        # labels[i] = '$' + (str(all_states[i])) + '$'
-    
-    # pprint.pprint(labels)
-    # print labels
-    # nx.draw(G)
-    # nx.draw_networkx_labels(G,nx.spring_layout(G), labels, font_size=16)
-    # plt.show()
-    app = Viewer(G)
-    app.mainloop()
-    tfile.close()
+    dot = Digraph(comment='State-Graph')
+    existent_nodes = {}
+    unique_id = 0
+
+    for sequence in range(len(neighbours_list_str)):
+        if len(neighbours_list_str[sequence])>1:
+            parentname = neighbours_list_str[sequence][0]
+            if parentname not in existent_nodes:
+                unique_id += 1
+                parentid = ascii_lowercase[unique_id].upper()
+                existent_nodes[parentname] = parentid
+                plabelpart1 = parentid + '\n' 
+                plabelpart2 = get_string(parentname)
+                parentlabel = plabelpart1 + plabelpart2
+                dot.node(parentid, parentlabel)
+            for child in range(1, len(neighbours_list_str[sequence])):
+                childname = neighbours_list_str[sequence][child]
+                if childname not in existent_nodes:
+                    unique_id += 1
+                    childid = ascii_lowercase[unique_id].upper()
+                    existent_nodes[childname] = childid
+                    clabelpart1 = childid + '\n'
+                    clabelpart2 = get_string(childname)
+                    childlabel = clabelpart1 + clabelpart2
+                    dot.node(childid, childlabel)
+                dot.edge(existent_nodes[parentname], existent_nodes[childname])
+
+    dot.render('../stategraph.gv', view=True)
+
+        
     
 def define_problem_1():
     global quantities
     global VC_list
     global I_list
     global P_list
-    quantities = {'inflow': [zp, 'increasing'], 'volume': [zpm, ''],'outflow': [zpm, ''], 'height': [zpm, ''], 'pressure': [zpm, '']}
+    quantities = {'inflow': [zp, user_input], 'volume': [zpm, ''],'outflow': [zpm, ''], 'height': [zpm, ''], 'pressure': [zpm, '']}
     
     #variable correspondances - [from_qname, value, to_qname, value]
     VC1 = ['volume', 'max', 'outflow', 'max']
@@ -560,6 +601,19 @@ def define_problem_2():
 
 #START PROGRAM
 if __name__ == "__main__":
+    print '\n####\nQR-project Nedko Savov & Diede Rusticus. \n####\n\nCode for creating the graph is put in comments assuming the you do not have the proper pygraphviz package installed. If you do want to run the code and create the statediagram then decomment the code in the start() function.\n\nThe extended model is used to execute the program.'
+    user_input = raw_input('\n\n>>>> Choose the exogonous value for inflow (i=increasing, d=decreasing, s=stable, r=random): ')
+    if user_input == 'i':
+        user_input = 'increasing'
+    elif user_input == 'd':
+        user_input = 'decreasing'
+    elif user_input == 's':
+        user_input = 'stable'
+    elif user_input == 'r':
+        user_input = 'random'
+    else:
+        print 'sorry no valid input was found, please try to execute the program one more time and enter a valid input.'
+    print '\nYou chose '+user_input+' as the exogonous value for inflow. \nThe state-graph will be saved in a textfile in your directory and if the code is active, also in a pdf file.\n'
     global tfile
     tfile = open('trace.txt', 'w')
     define_problem_1()
