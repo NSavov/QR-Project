@@ -476,7 +476,7 @@ def start():
                 neighs.append(str(all_states[ind]))
         neighbours_list_str.append(neighs)
     
-    f = open('../state-graph-as-list.txt','w')    
+    f = open('state-graph-as-list.txt','w')    
     for parent_list in neighbours_list_str:
         if len(parent_list) > 1:
             f.write('\nparent:\n\n')
@@ -537,7 +537,7 @@ def start():
                     dot.node(childid, childlabel)
                 dot.edge(existent_nodes[parentname], existent_nodes[childname])
 
-    dot.render('../stategraph.gv', view=True)
+    dot.render('stategraph.gv', view=True)
 
         
     

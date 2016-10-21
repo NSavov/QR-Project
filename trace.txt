@@ -1,0 +1,31 @@
+Find all states that are possible for this input
+    Generating all possible (valid and invalid) states
+    39366 possible (valid and invalid) states found
+    Select only the valid states. For every state:
+        Check if the VCs are satisfied
+        Check if the influences are satisfied
+        Check if the proportionalities are satisfied
+        Check if the algorithm constraints are satisfied
+    24 possible valid states found
+Find the edges of the graph
+    Find all exogenous quantities:['inflow']
+    Find all derivatives that can be inferred from influences and proportionalities: ['volume', 'pressure', 'outflow', 'height']
+    Based on these find all the derivatives that cannot change from influences and proportionalities: []
+    Assume these non-changable derivatives to be random exogenous
+    For every state (example values are for first state only):
+        Example state: volume zero 0 pressure zero 0 outflow zero 0 inflow zero + height zero 0 
+        Get the quantities that can change in the next step: ['volume', 'pressure', 'outflow', 'height']
+        If there are no instantaneous changes: get a list of valid states with changes in every possible combination of changable quantities
+        If there are instantaneous changes - get one state with all of them applied
+            Example: Instantenious transition, next state (only magnitutes changed):volume zero 0 pressure zero 0 outflow zero 0 inflow plus + height zero 0 
+        For all states with changed quantities:
+            In case of instant change - find the next state with least amount of derivative changes
+            Otherwise: find all possible children without restrictions
+                Filter the possible matching children from all valid states:
+                    Filter out all the states not matching the new quantities
+                    Filter out all the states with different derivatives defined as non-changable
+                    Filter out all the states which doesn't match an exogenous change
+                    Filter out all the states that have incontinuous gradients
+            Connect the state with the found new states
+                Example: 1 found child(ren): 
+                    volume zero + pressure zero + outflow zero + inflow plus + height zero + 
