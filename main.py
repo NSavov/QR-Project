@@ -92,6 +92,7 @@ def get_arrow(all_states, new_state, exogenous, non_changable_derivs):
                 tfile.write( tc*tab + "Filter out all the states not matching the new quantities" + '\n')
                 tfile.write( tc*tab + "Filter out all the states with different derivatives defined as non-changable" + '\n')
                 tfile.write( tc*tab + "Filter out all the states which doesn't match an exogenous change" + '\n')
+                tfile.write( tc*tab + "Filter out all the states that have incontinuous gradients" + '\n')
     #quantity filtering
     for state in all_states:
         for key, value in new_state.items():
